@@ -1,0 +1,416 @@
+package com.vitalii.s.a10tictactoe;
+
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Rect;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.util.Iterator;
+
+import playground.Board;
+import playground.Bot;
+import playground.Cell;
+import playground.Seed;
+import playground.SimplePlayGround;
+import playground.State;
+
+/**
+ * Created by user on 30.10.2016.
+ */
+public class GameViewStatic extends View implements SoundPool.OnLoadCompleteListener {
+
+
+    public class GameThread extends Thread {
+
+        @Override
+        public void run() {
+            for (int i = 0; i < rects.length; i++) {
+                for (int j = 0; j < rects[i].length; j++) {
+                    if (rects[i][j].contains((int) touchX, (int) touchY)
+                            && !simplePlayGround.isFinished()
+                            && simplePlayGround.getCurrentPlayer() == Seed.CROSS
+                            && simplePlayGround.getBoard().cells[i][j].content == Seed.EMPTY) {
+                        simplePlayGround.doStep(i, j);
+                        postInvalidate();
+                        if (simplePlayGround.getBoard().hasWon(Seed.CROSS)) {
+                            streamId=mSoundPool.play(soundID, 1, 1, 0, 0, 1);
+                            showWinner();
+                            mSoundPool.stop(streamId);
+
+                        }
+
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                        }
+                        if (!simplePlayGround.isFinished()) {
+                            makeBotMove();
+                            postInvalidate();
+                            if (simplePlayGround.getBoard().hasWon(Seed.NOUGHT)) {
+                                streamId=mSoundPool.play(soundID, 1, 1, 0, 0, 1);
+                                showWinner();
+                                mSoundPool.stop(streamId);
+                            }
+
+                        }
+
+                    }
+                    if (rects[i][j].contains((int) touchX, (int) touchY)) flag = true;
+                }
+            }
+            if (simplePlayGround.isFinished() && !flag) {
+                simplePlayGround.start();
+                bot.start();
+                postInvalidate();
+
+            }
+        }
+
+        public void showWinner() {
+
+
+            winningFields = simplePlayGround.getBoard().winningFields;
+            int x1 = winningFields[0][0];
+            int y1 = winningFields[0][1];
+            int x2 = winningFields[1][0];
+            int y2 = winningFields[1][1];
+            int x3 = winningFields[2][0];
+            int y3 = winningFields[2][1];
+            Seed tempContent1 = simplePlayGround.getBoard().cells[x1][y1].content;
+            Seed tempContent2 = simplePlayGround.getBoard().cells[x2][y2].content;
+            Seed tempContent3 = simplePlayGround.getBoard().cells[x3][y3].content;
+
+
+            for (int i = 0; i < 3; i++) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
+
+                simplePlayGround.getBoard().cells[x1][y1].content = Seed.EMPTY;
+                simplePlayGround.getBoard().cells[x2][y2].content = Seed.EMPTY;
+                simplePlayGround.getBoard().cells[x3][y3].content = Seed.EMPTY;
+                postInvalidate();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
+
+                simplePlayGround.getBoard().cells[x1][y1].content = tempContent1;
+                simplePlayGround.getBoard().cells[x2][y2].content = tempContent2;
+                simplePlayGround.getBoard().cells[x3][y3].content = tempContent3;
+                System.out.println(simplePlayGround.getBoard().cells[x1][y1].content);
+                postInvalidate();
+            }
+
+
+        }
+    }
+
+    private Rect[][] rects = new Rect[3][3];
+    private static final int size = 3;
+    private Paint mPaint;
+    private Paint mCirclePaint;
+    private Paint mCrossPaint;
+    public static final int WIDTH = 960;
+    public static final int HEIGHT = 1280;
+    float touchX = 0;
+    float touchY = 0;
+    private Bitmap bitmap;
+    public SimplePlayGround simplePlayGround = new SimplePlayGround();
+    private Bot bot = new Bot();
+    private boolean flag;
+    private Thread gameThread;
+    private boolean firstThread;
+    private int[][] winningFields;
+    private SoundPool mSoundPool;
+    private int soundID;
+    private int streamId;
+    final int MAX_STREAMS = 5;
+
+    public GameViewStatic(Context context) {
+        super(context);
+        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
+        mSoundPool.setOnLoadCompleteListener(this);
+        soundID = mSoundPool.load(context, R.raw.win, 1);
+        init();
+
+    }
+
+    // эти два конструктора нужны , если будем использовать вместе с кнопками
+    public GameViewStatic(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
+        mSoundPool.setOnLoadCompleteListener(this);
+        soundID = mSoundPool.load(context, R.raw.win, 1);
+        init();
+    }
+
+    // то есть если будем добавлять наш GameViewStatic как customView чере разметку
+    public GameViewStatic(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
+        mSoundPool.setOnLoadCompleteListener(this);
+        soundID = mSoundPool.load(context, R.raw.win, 1);
+        init();
+    }
+
+    public void init() {
+        mPaint = new Paint();
+        mPaint.setColor(Color.BLACK);
+        mPaint.setStrokeWidth(10);
+        mCirclePaint = new Paint();
+        mCirclePaint.setColor(Color.RED);
+        mCirclePaint.setStrokeWidth(10);
+        mCrossPaint = new Paint();
+        mCrossPaint.setColor(Color.BLUE);
+        mCrossPaint.setStrokeWidth(10);
+        mCrossPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mCirclePaint.setStyle(Paint.Style.STROKE);
+        simplePlayGround.start();
+        //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
+        bitmap = StartingActivity.getBitmapFromCache("1");
+        firstThread = true;
+
+
+    }
+
+    @Override
+    public void onLoadComplete(SoundPool soundPool, int i, int i1) {
+
+    }
+
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+
+        final float scaleFactorX;
+        final float scaleFactorY;
+
+        if (getWidth() > WIDTH || getHeight() > HEIGHT) {
+            scaleFactorX = (float) getWidth() / WIDTH;
+            scaleFactorY = (float) getHeight() / HEIGHT;
+        } else {
+            scaleFactorX = 1;
+            scaleFactorY = 1;
+        }
+        final int savedState = canvas.save();
+        canvas.scale(scaleFactorX, scaleFactorY);
+        canvas.drawBitmap(bitmap, 0, 0, null);
+        canvas.restoreToCount(savedState);
+
+        float fieldLength = getWidth() / 2;
+
+        float startPosX1 = (getWidth() - fieldLength) / 2 + fieldLength / size;
+        float startPosY1 = (getHeight() - fieldLength) / 2;
+        float startPosX2 = startPosX1;
+        float startPosY2 = startPosY1 + fieldLength;
+        canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
+
+        float startPosX3 = startPosX1 + fieldLength / size;
+        float startPosY3 = startPosY1;
+        float startPosX4 = startPosX3;
+        float startPosY4 = startPosY1 + fieldLength;
+        canvas.drawLine(startPosX3, startPosY3, startPosX4, startPosY4, mPaint);
+
+        float startPosX5 = (getWidth() - fieldLength) / 2;
+        float startPosY5 = (getHeight() / 2) - fieldLength / size / 2;
+        float startPosX6 = startPosX5 + fieldLength;
+        float startPosY6 = startPosY5;
+        canvas.drawLine(startPosX5, startPosY5, startPosX6, startPosY6, mPaint);
+
+        float startPosX7 = startPosX5;
+        float startPosY7 = (getHeight() / 2) + fieldLength / size / 2;
+        float startPosX8 = startPosX7 + fieldLength;
+        float startPosY8 = startPosY7;
+        canvas.drawLine(startPosX7, startPosY7, startPosX8, startPosY8, mPaint);
+
+        if (rects[0][0] == null) {
+            rects[0][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 - fieldLength / size),
+                    (int) startPosX1, (int) startPosY5);
+            rects[0][1] = new Rect((int) startPosX1, (int) (startPosY5 - fieldLength / size),
+                    (int) (startPosX1 + fieldLength / size), (int) startPosY5);
+            rects[0][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 - fieldLength / size),
+                    (int) (startPosX1 + 2 * fieldLength / size), (int) startPosY5);
+            rects[1][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) startPosY5,
+                    (int) startPosX1, (int) (startPosY5 + fieldLength / size));
+            rects[1][1] = new Rect((int) startPosX1, (int) startPosY5,
+                    (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size));
+            rects[1][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) startPosY5,
+                    (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size));
+            rects[2][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 + fieldLength / size),
+                    (int) startPosX1, (int) (startPosY5 + fieldLength / size * 2));
+            rects[2][1] = new Rect((int) startPosX1, (int) (startPosY5 + fieldLength / size),
+                    (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
+            rects[2][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size),
+                    (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
+        }
+
+
+        for (int i = 0; i < rects.length; i++) {
+            for (int j = 0; j < rects[i].length; j++) {
+
+                if (simplePlayGround.getBoard().cells[i][j].content == Seed.CROSS) {
+                    drawCross(canvas, rects[i][j].centerX(), rects[i][j].centerY());
+                } else {
+                    if (simplePlayGround.getBoard().cells[i][j].content == Seed.NOUGHT) {
+                        drawCirlce(canvas, rects[i][j].centerX(), rects[i][j].centerY());
+                    }
+
+                }
+
+            }
+        }
+
+
+    }
+
+
+    public boolean onTouchEvent(MotionEvent event) {
+        if (firstThread || !gameThread.isAlive()) {
+//        try {
+//            Thread.sleep(16);
+//        }catch (InterruptedException e) {}
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                flag = false;
+                touchX = event.getX();
+                touchY = event.getY();
+                gameThread = new GameThread();
+                gameThread.setDaemon(true);
+                gameThread.start();
+                firstThread = false;
+            }
+
+
+//            for (int i = 0; i < rects.length; i++) {
+//                for (int j = 0; j < rects[i].length; j++) {
+//                    if (rects[i][j].contains((int) touchX, (int) touchY) &&
+//                            simplePlayGround.getBoard().cells[i][j].content == Seed.EMPTY) {
+//                        simplePlayGround.doStep(i, j);
+//
+//                    }
+//                    if (rects[i][j].contains((int) touchX, (int) touchY)) flag = true;
+//                }
+//            }
+//            if (simplePlayGround.isFinished() && !flag) {
+//                simplePlayGround.start();
+//                bot.start();
+//            }
+//
+//
+//            makeBotMove();
+//            invalidate();
+
+        }
+
+
+        return true;
+    }
+
+
+    public void drawCirlce(Canvas canvas, int x, int y) {
+        Path circlePath = new Path();
+        circlePath.addCircle(x, y, (getWidth() / 2 / size - 30) / 2, Path.Direction.CW);
+        canvas.drawPath(circlePath, mCirclePaint);
+
+    }
+
+    public void drawCross(Canvas canvas, int x, int y) {
+        float x1 = (x - (getWidth() / 2 / size / 2 - 15));
+        float y1 = (y - (getWidth() / 2 / size / 2 - 15));
+        float x2 = (x + (getWidth() / 2 / size / 2 - 15));
+        float y2 = (y + (getWidth() / 2 / size / 2 - 15));
+        canvas.drawLine(x1, y1, x2, y2, mCrossPaint);
+
+        float x3 = (x + (getWidth() / 2 / size / 2 - 15));
+        float y3 = (y - (getWidth() / 2 / size / 2 - 15));
+        float x4 = (x - (getWidth() / 2 / size / 2 - 15));
+        float y4 = (y + (getWidth() / 2 / size / 2 - 15));
+
+        canvas.drawLine(x3, y3, x4, y4, mCrossPaint);
+    }
+
+    public int[][] findWinningRects() {
+        int[][] winningRects = new int[3][2];
+        if (this.simplePlayGround.getBoard().cells[0][0].content == Seed.CROSS
+                && this.simplePlayGround.getBoard().cells[0][1].content == Seed.CROSS
+                && this.simplePlayGround.getBoard().cells[0][2].content == Seed.CROSS
+                || this.simplePlayGround.getBoard().cells[1][0].content == Seed.NOUGHT
+                && this.simplePlayGround.getBoard().cells[1][1].content == Seed.NOUGHT
+                && this.simplePlayGround.getBoard().cells[1][2].content == Seed.NOUGHT) {
+            winningRects[0][0] = 0;
+            winningRects[0][1] = 0;
+            winningRects[1][0] = 0;
+            winningRects[1][1] = 1;
+            winningRects[2][0] = 0;
+            winningRects[2][1] = 2;
+
+
+        }
+        return winningRects;
+    }
+
+    public void showWinner() {
+        int[][] winningRects = findWinningRects();
+        SimplePlayGround tempPlayground = this.simplePlayGround;
+
+
+//            simplePlayGround.getBoard().cells[winningRects[0][0]][winningRects[0][1]].content = Seed.EMPTY;
+//            simplePlayGround.getBoard().cells[winningRects[1][0]][winningRects[1][1]].content = Seed.EMPTY;
+//            simplePlayGround.getBoard().cells[winningRects[2][0]][winningRects[2][1]].content = Seed.EMPTY;
+        simplePlayGround.getBoard().cells[0][0].content = Seed.EMPTY;
+        simplePlayGround.getBoard().cells[0][1].content = Seed.EMPTY;
+        simplePlayGround.getBoard().cells[0][2].content = Seed.EMPTY;
+
+        invalidate();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+        simplePlayGround.getBoard().cells[winningRects[0][0]][winningRects[0][1]].content =
+                tempPlayground.getBoard().cells[winningRects[0][0]][winningRects[0][1]].content;
+        simplePlayGround.getBoard().cells[winningRects[1][0]][winningRects[1][1]].content =
+                tempPlayground.getBoard().cells[winningRects[1][0]][winningRects[1][1]].content;
+        simplePlayGround.getBoard().cells[winningRects[2][0]][winningRects[2][1]].content =
+                tempPlayground.getBoard().cells[winningRects[2][0]][winningRects[2][1]].content;
+        invalidate();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+
+
+    }
+
+    public void makeBotMove() {
+        if (simplePlayGround.getCurrentPlayer() == Seed.NOUGHT && !simplePlayGround.isFinished()) {
+            int[] compMove = bot.makeMove(simplePlayGround);
+            int a = compMove[0];
+            int b = compMove[1];
+            State state = simplePlayGround.doStep(a, b);
+
+        }
+
+    }
+
+
+}
