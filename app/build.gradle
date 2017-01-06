@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:design:24.0.0'
     // https://mvnrepository.com/artifact/com.jakewharton/disklrucache
     compile group: 'com.jakewharton', name: 'disklrucache', version: '2.0.2'
+    compile 'com.google.code.gson:gson:2.8.0'
 }

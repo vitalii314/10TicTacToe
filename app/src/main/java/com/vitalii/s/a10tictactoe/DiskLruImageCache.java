@@ -22,7 +22,7 @@ import java.io.OutputStream;
 
 public class DiskLruImageCache {
 
-    private DiskLruCache mDiskCache;
+    public  DiskLruCache mDiskCache;
     private Bitmap.CompressFormat mCompressFormat = Bitmap.CompressFormat.JPEG;
     private int mCompressQuality = 70;
     private static final int APP_VERSION = 1;
@@ -167,6 +167,8 @@ public class DiskLruImageCache {
     public File getCacheFolder() {
         return mDiskCache.getDirectory();
     }
+
+
 
 }
 

@@ -14,13 +14,21 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.os.ParcelableCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.widget.Checkable;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -31,6 +39,7 @@ import playground.Cell;
 import playground.Seed;
 import playground.SimplePlayGround;
 import playground.State;
+
 
 /**
  * Created by user on 30.10.2016.
@@ -51,7 +60,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                         simplePlayGround.doStep(i, j);
                         postInvalidate();
                         if (simplePlayGround.getBoard().hasWon(Seed.CROSS)) {
-                            streamId=mSoundPool.play(soundID, 1, 1, 0, 0, 1);
+                            streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                             showWinner();
                             mSoundPool.stop(streamId);
 
@@ -65,7 +74,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                             makeBotMove();
                             postInvalidate();
                             if (simplePlayGround.getBoard().hasWon(Seed.NOUGHT)) {
-                                streamId=mSoundPool.play(soundID, 1, 1, 0, 0, 1);
+                                streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                                 showWinner();
                                 mSoundPool.stop(streamId);
                             }
@@ -117,7 +126,6 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                 simplePlayGround.getBoard().cells[x1][y1].content = tempContent1;
                 simplePlayGround.getBoard().cells[x2][y2].content = tempContent2;
                 simplePlayGround.getBoard().cells[x3][y3].content = tempContent3;
-                System.out.println(simplePlayGround.getBoard().cells[x1][y1].content);
                 postInvalidate();
             }
 
@@ -135,8 +143,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     float touchX = 0;
     float touchY = 0;
     private Bitmap bitmap;
-    public SimplePlayGround simplePlayGround = new SimplePlayGround();
-    private Bot bot = new Bot();
+    public SimplePlayGround simplePlayGround;
+    private Bot bot;
     private boolean flag;
     private Thread gameThread;
     private boolean firstThread;
@@ -186,9 +194,11 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         mCrossPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStyle(Paint.Style.STROKE);
+        simplePlayGround = new SimplePlayGround();
         simplePlayGround.start();
-        //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
-        bitmap = StartingActivity.getBitmapFromCache("1");
+        bot = new Bot();
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
+        //bitmap = StartingActivity.getBitmapFromCache("1");
         firstThread = true;
 
 
@@ -287,6 +297,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
     public boolean onTouchEvent(MotionEvent event) {
         if (firstThread || !gameThread.isAlive()) {
+
 //        try {
 //            Thread.sleep(16);
 //        }catch (InterruptedException e) {}
@@ -300,25 +311,6 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                 firstThread = false;
             }
 
-
-//            for (int i = 0; i < rects.length; i++) {
-//                for (int j = 0; j < rects[i].length; j++) {
-//                    if (rects[i][j].contains((int) touchX, (int) touchY) &&
-//                            simplePlayGround.getBoard().cells[i][j].content == Seed.EMPTY) {
-//                        simplePlayGround.doStep(i, j);
-//
-//                    }
-//                    if (rects[i][j].contains((int) touchX, (int) touchY)) flag = true;
-//                }
-//            }
-//            if (simplePlayGround.isFinished() && !flag) {
-//                simplePlayGround.start();
-//                bot.start();
-//            }
-//
-//
-//            makeBotMove();
-//            invalidate();
 
         }
 
@@ -411,6 +403,86 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         }
 
     }
+
+
+    static class SavedState extends BaseSavedState {
+        String savedPlayground;
+        String savedBot;
+
+
+        SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        private SavedState(Parcel in) {
+            super(in);
+            savedPlayground = in.readString();
+            savedBot = in.readString();
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeString(savedPlayground);
+            out.writeString(savedPlayground);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR =
+                new Parcelable.Creator<SavedState>() {
+                    public SavedState createFromParcel(Parcel in) {
+                        return new SavedState(in);
+                    }
+
+                    public SavedState[] newArray(int size) {
+                        return new SavedState[size];
+                    }
+                };
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        SavedState ss = new SavedState(superState);
+        ss.savedPlayground = new Gson().toJson(simplePlayGround);
+        ss.savedBot = new Gson().toJson(bot);
+        return ss;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        if (!(state instanceof SavedState)) {
+            super.onRestoreInstanceState(state);
+            return;
+        }
+
+        SavedState ss = (SavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+        simplePlayGround = new Gson().fromJson(ss.savedPlayground, SimplePlayGround.class);
+        bot = new Gson().fromJson(ss.savedBot, Bot.class);
+        this.firstThread = true;
+
+    }
+
+
+//    @Override
+//    public Parcelable onSaveInstanceState() {
+//        Bundle bundle = new Bundle();
+//        bundle.putParcelable("superState",super.onSaveInstanceState());
+//        bundle.putString("stuff", new Gson().toJson(this.simplePlayGround));
+//        return bundle;
+//    }
+
+//    @Override
+//    public void onRestoreInstanceState(Parcelable state) {
+//        if (state instanceof Bundle) {
+//            Bundle bundle = (Bundle)state;
+//            this.simplePlayGround = new Gson().fromJson(bundle.getString("stuff"),SimplePlayGround.class);
+//            this.simplePlayGround.getBoard().cells[1][1].content=Seed.CROSS;
+//            state = bundle.getParcelable("superState");
+//        }
+//        this.simplePlayGround.getBoard().cells[1][1].content=Seed.CROSS;
+//        super.onRestoreInstanceState(state);
+//    }
 
 
 }
