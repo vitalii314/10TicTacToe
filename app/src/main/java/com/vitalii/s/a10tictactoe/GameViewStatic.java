@@ -10,11 +10,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
@@ -29,9 +31,14 @@ import android.widget.Checkable;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import playground.Board;
 import playground.Bot;
@@ -153,6 +160,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     private int soundID;
     private int streamId;
     final int MAX_STREAMS = 5;
+    final List<Target> targets = new ArrayList<>();
+
 
     public GameViewStatic(Context context) {
         super(context);
@@ -182,6 +191,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     }
 
     public void init() {
+
         mPaint = new Paint();
         mPaint.setColor(Color.BLACK);
         mPaint.setStrokeWidth(10);
@@ -197,12 +207,38 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         simplePlayGround = new SimplePlayGround();
         simplePlayGround.start();
         bot = new Bot();
-        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
+        //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
         //bitmap = StartingActivity.getBitmapFromCache("1");
         firstThread = true;
+        Target mTarget = new Target() {
 
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                GameViewStatic.this.bitmap = bitmap;
+                invalidate();
+                targets.remove(this);
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                targets.remove(this);
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+
+
+        };
+
+        targets.add(mTarget);
+        Picasso.with(getContext()).load(R.drawable.kletka3).
+                memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).into(targets.get(0));
 
     }
+
 
     @Override
     public void onLoadComplete(SoundPool soundPool, int i, int i1) {
@@ -212,95 +248,94 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (bitmap != null) {
 
-        final float scaleFactorX;
-        final float scaleFactorY;
+            final float scaleFactorX;
+            final float scaleFactorY;
 
-        if (getWidth() > WIDTH || getHeight() > HEIGHT) {
-            scaleFactorX = (float) getWidth() / WIDTH;
-            scaleFactorY = (float) getHeight() / HEIGHT;
-        } else {
-            scaleFactorX = 1;
-            scaleFactorY = 1;
-        }
-        final int savedState = canvas.save();
-        canvas.scale(scaleFactorX, scaleFactorY);
-        canvas.drawBitmap(bitmap, 0, 0, null);
-        canvas.restoreToCount(savedState);
+            if (getWidth() > WIDTH || getHeight() > HEIGHT) {
+                scaleFactorX = (float) getWidth() / WIDTH;
+                scaleFactorY = (float) getHeight() / HEIGHT;
+            } else {
+                scaleFactorX = 1;
+                scaleFactorY = 1;
+            }
+            final int savedState = canvas.save();
+            canvas.scale(scaleFactorX, scaleFactorY);
 
-        float fieldLength = getWidth() / 2;
+            canvas.drawBitmap(bitmap, 0, 0, null);
+            canvas.restoreToCount(savedState);
 
-        float startPosX1 = (getWidth() - fieldLength) / 2 + fieldLength / size;
-        float startPosY1 = (getHeight() - fieldLength) / 2;
-        float startPosX2 = startPosX1;
-        float startPosY2 = startPosY1 + fieldLength;
-        canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
+            float fieldLength = getWidth() / 2;
 
-        float startPosX3 = startPosX1 + fieldLength / size;
-        float startPosY3 = startPosY1;
-        float startPosX4 = startPosX3;
-        float startPosY4 = startPosY1 + fieldLength;
-        canvas.drawLine(startPosX3, startPosY3, startPosX4, startPosY4, mPaint);
+            float startPosX1 = (getWidth() - fieldLength) / 2 + fieldLength / size;
+            float startPosY1 = (getHeight() - fieldLength) / 2;
+            float startPosX2 = startPosX1;
+            float startPosY2 = startPosY1 + fieldLength;
+            canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
 
-        float startPosX5 = (getWidth() - fieldLength) / 2;
-        float startPosY5 = (getHeight() / 2) - fieldLength / size / 2;
-        float startPosX6 = startPosX5 + fieldLength;
-        float startPosY6 = startPosY5;
-        canvas.drawLine(startPosX5, startPosY5, startPosX6, startPosY6, mPaint);
+            float startPosX3 = startPosX1 + fieldLength / size;
+            float startPosY3 = startPosY1;
+            float startPosX4 = startPosX3;
+            float startPosY4 = startPosY1 + fieldLength;
+            canvas.drawLine(startPosX3, startPosY3, startPosX4, startPosY4, mPaint);
 
-        float startPosX7 = startPosX5;
-        float startPosY7 = (getHeight() / 2) + fieldLength / size / 2;
-        float startPosX8 = startPosX7 + fieldLength;
-        float startPosY8 = startPosY7;
-        canvas.drawLine(startPosX7, startPosY7, startPosX8, startPosY8, mPaint);
+            float startPosX5 = (getWidth() - fieldLength) / 2;
+            float startPosY5 = (getHeight() / 2) - fieldLength / size / 2;
+            float startPosX6 = startPosX5 + fieldLength;
+            float startPosY6 = startPosY5;
+            canvas.drawLine(startPosX5, startPosY5, startPosX6, startPosY6, mPaint);
 
-        if (rects[0][0] == null) {
-            rects[0][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 - fieldLength / size),
-                    (int) startPosX1, (int) startPosY5);
-            rects[0][1] = new Rect((int) startPosX1, (int) (startPosY5 - fieldLength / size),
-                    (int) (startPosX1 + fieldLength / size), (int) startPosY5);
-            rects[0][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 - fieldLength / size),
-                    (int) (startPosX1 + 2 * fieldLength / size), (int) startPosY5);
-            rects[1][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) startPosY5,
-                    (int) startPosX1, (int) (startPosY5 + fieldLength / size));
-            rects[1][1] = new Rect((int) startPosX1, (int) startPosY5,
-                    (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size));
-            rects[1][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) startPosY5,
-                    (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size));
-            rects[2][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 + fieldLength / size),
-                    (int) startPosX1, (int) (startPosY5 + fieldLength / size * 2));
-            rects[2][1] = new Rect((int) startPosX1, (int) (startPosY5 + fieldLength / size),
-                    (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
-            rects[2][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size),
-                    (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
-        }
+            float startPosX7 = startPosX5;
+            float startPosY7 = (getHeight() / 2) + fieldLength / size / 2;
+            float startPosX8 = startPosX7 + fieldLength;
+            float startPosY8 = startPosY7;
+            canvas.drawLine(startPosX7, startPosY7, startPosX8, startPosY8, mPaint);
+
+            if (rects[0][0] == null) {
+                rects[0][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 - fieldLength / size),
+                        (int) startPosX1, (int) startPosY5);
+                rects[0][1] = new Rect((int) startPosX1, (int) (startPosY5 - fieldLength / size),
+                        (int) (startPosX1 + fieldLength / size), (int) startPosY5);
+                rects[0][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 - fieldLength / size),
+                        (int) (startPosX1 + 2 * fieldLength / size), (int) startPosY5);
+                rects[1][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) startPosY5,
+                        (int) startPosX1, (int) (startPosY5 + fieldLength / size));
+                rects[1][1] = new Rect((int) startPosX1, (int) startPosY5,
+                        (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size));
+                rects[1][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) startPosY5,
+                        (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size));
+                rects[2][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 + fieldLength / size),
+                        (int) startPosX1, (int) (startPosY5 + fieldLength / size * 2));
+                rects[2][1] = new Rect((int) startPosX1, (int) (startPosY5 + fieldLength / size),
+                        (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
+                rects[2][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size),
+                        (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
+            }
 
 
-        for (int i = 0; i < rects.length; i++) {
-            for (int j = 0; j < rects[i].length; j++) {
+            for (int i = 0; i < rects.length; i++) {
+                for (int j = 0; j < rects[i].length; j++) {
 
-                if (simplePlayGround.getBoard().cells[i][j].content == Seed.CROSS) {
-                    drawCross(canvas, rects[i][j].centerX(), rects[i][j].centerY());
-                } else {
-                    if (simplePlayGround.getBoard().cells[i][j].content == Seed.NOUGHT) {
-                        drawCirlce(canvas, rects[i][j].centerX(), rects[i][j].centerY());
+                    if (simplePlayGround.getBoard().cells[i][j].content == Seed.CROSS) {
+                        drawCross(canvas, rects[i][j].centerX(), rects[i][j].centerY());
+                    } else {
+                        if (simplePlayGround.getBoard().cells[i][j].content == Seed.NOUGHT) {
+                            drawCirlce(canvas, rects[i][j].centerX(), rects[i][j].centerY());
+                        }
+
                     }
 
                 }
-
             }
+
+
         }
-
-
     }
 
 
     public boolean onTouchEvent(MotionEvent event) {
         if (firstThread || !gameThread.isAlive()) {
-
-//        try {
-//            Thread.sleep(16);
-//        }catch (InterruptedException e) {}
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 flag = false;
                 touchX = event.getX();
@@ -311,9 +346,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                 firstThread = false;
             }
 
-
         }
-
 
         return true;
     }
@@ -339,6 +372,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         float y4 = (y + (getWidth() / 2 / size / 2 - 15));
 
         canvas.drawLine(x3, y3, x4, y4, mCrossPaint);
+        canvas.drawLine(x3, y3, x4, y4, mCrossPaint);
     }
 
     public int[][] findWinningRects() {
@@ -361,37 +395,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         return winningRects;
     }
 
-    public void showWinner() {
-        int[][] winningRects = findWinningRects();
-        SimplePlayGround tempPlayground = this.simplePlayGround;
 
-
-//            simplePlayGround.getBoard().cells[winningRects[0][0]][winningRects[0][1]].content = Seed.EMPTY;
-//            simplePlayGround.getBoard().cells[winningRects[1][0]][winningRects[1][1]].content = Seed.EMPTY;
-//            simplePlayGround.getBoard().cells[winningRects[2][0]][winningRects[2][1]].content = Seed.EMPTY;
-        simplePlayGround.getBoard().cells[0][0].content = Seed.EMPTY;
-        simplePlayGround.getBoard().cells[0][1].content = Seed.EMPTY;
-        simplePlayGround.getBoard().cells[0][2].content = Seed.EMPTY;
-
-        invalidate();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        simplePlayGround.getBoard().cells[winningRects[0][0]][winningRects[0][1]].content =
-                tempPlayground.getBoard().cells[winningRects[0][0]][winningRects[0][1]].content;
-        simplePlayGround.getBoard().cells[winningRects[1][0]][winningRects[1][1]].content =
-                tempPlayground.getBoard().cells[winningRects[1][0]][winningRects[1][1]].content;
-        simplePlayGround.getBoard().cells[winningRects[2][0]][winningRects[2][1]].content =
-                tempPlayground.getBoard().cells[winningRects[2][0]][winningRects[2][1]].content;
-        invalidate();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-
-
-    }
 
     public void makeBotMove() {
         if (simplePlayGround.getCurrentPlayer() == Seed.NOUGHT && !simplePlayGround.isFinished()) {
@@ -424,7 +428,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
             out.writeString(savedPlayground);
-            out.writeString(savedPlayground);
+            out.writeString(savedBot);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
@@ -459,30 +463,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         super.onRestoreInstanceState(ss.getSuperState());
         simplePlayGround = new Gson().fromJson(ss.savedPlayground, SimplePlayGround.class);
         bot = new Gson().fromJson(ss.savedBot, Bot.class);
-        this.firstThread = true;
+
 
     }
-
-
-//    @Override
-//    public Parcelable onSaveInstanceState() {
-//        Bundle bundle = new Bundle();
-//        bundle.putParcelable("superState",super.onSaveInstanceState());
-//        bundle.putString("stuff", new Gson().toJson(this.simplePlayGround));
-//        return bundle;
-//    }
-
-//    @Override
-//    public void onRestoreInstanceState(Parcelable state) {
-//        if (state instanceof Bundle) {
-//            Bundle bundle = (Bundle)state;
-//            this.simplePlayGround = new Gson().fromJson(bundle.getString("stuff"),SimplePlayGround.class);
-//            this.simplePlayGround.getBoard().cells[1][1].content=Seed.CROSS;
-//            state = bundle.getParcelable("superState");
-//        }
-//        this.simplePlayGround.getBoard().cells[1][1].content=Seed.CROSS;
-//        super.onRestoreInstanceState(state);
-//    }
 
 
 }
