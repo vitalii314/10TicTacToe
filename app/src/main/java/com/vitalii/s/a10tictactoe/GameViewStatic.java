@@ -67,6 +67,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                         simplePlayGround.doStep(i, j);
                         postInvalidate();
                         if (simplePlayGround.getBoard().hasWon(Seed.CROSS)) {
+                            compWin++;
                             streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                             showWinner();
                             mSoundPool.stop(streamId);
@@ -81,6 +82,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                             makeBotMove();
                             postInvalidate();
                             if (simplePlayGround.getBoard().hasWon(Seed.NOUGHT)) {
+                                compWin++;
                                 streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                                 showWinner();
                                 mSoundPool.stop(streamId);
@@ -154,13 +156,16 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     private Bot bot;
     private boolean flag;
     private Thread gameThread;
-    private boolean firstThread;
+    private boolean firstThread=false;
     private int[][] winningFields;
     private SoundPool mSoundPool;
     private int soundID;
     private int streamId;
     final int MAX_STREAMS = 5;
     final List<Target> targets = new ArrayList<>();
+    public static int playerWin;
+    public static int compWin;
+
 
 
     public GameViewStatic(Context context) {
@@ -207,6 +212,10 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         simplePlayGround = new SimplePlayGround();
         simplePlayGround.start();
         bot = new Bot();
+        if (!firstThread) {
+            playerWin = 0;
+            compWin = 0;
+        }
         //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
         //bitmap = StartingActivity.getBitmapFromCache("1");
         firstThread = true;
@@ -235,7 +244,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
         targets.add(mTarget);
         Picasso.with(getContext()).load(R.drawable.kletka3).
-                memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).into(targets.get(0));
+                memoryPolicy(MemoryPolicy.NO_STORE,MemoryPolicy.NO_CACHE).into(targets.get(0));
 
     }
 
@@ -412,6 +421,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     static class SavedState extends BaseSavedState {
         String savedPlayground;
         String savedBot;
+        int playerWin;
+        int compWin;
 
 
         SavedState(Parcelable superState) {
@@ -422,6 +433,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             super(in);
             savedPlayground = in.readString();
             savedBot = in.readString();
+            playerWin = in.readInt();
+            compWin = in.readInt();
         }
 
         @Override
@@ -429,6 +442,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             super.writeToParcel(out, flags);
             out.writeString(savedPlayground);
             out.writeString(savedBot);
+            out.writeInt(playerWin);
+            out.writeInt(compWin);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
@@ -449,6 +464,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         SavedState ss = new SavedState(superState);
         ss.savedPlayground = new Gson().toJson(simplePlayGround);
         ss.savedBot = new Gson().toJson(bot);
+        ss.playerWin = this.playerWin;
+        ss.compWin = this.compWin;
         return ss;
     }
 
@@ -463,6 +480,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         super.onRestoreInstanceState(ss.getSuperState());
         simplePlayGround = new Gson().fromJson(ss.savedPlayground, SimplePlayGround.class);
         bot = new Gson().fromJson(ss.savedBot, Bot.class);
+        this.playerWin = ss.playerWin;
+        this.compWin = ss.compWin;
+
 
 
     }

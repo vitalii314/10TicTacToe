@@ -3,4 +3,5 @@
     <string name="title_activity_starting">StartingActivity</string>
     <string name="singlePlayer">Single Player</string>
     <string name="multiPlayer">Multiplayer</string>
+    <string name="score">Score</string>
 </resources>

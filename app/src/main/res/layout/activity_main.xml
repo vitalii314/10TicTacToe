@@ -10,9 +10,30 @@
     tools:context=".MainActivity"
     android:weightSum="1">
 
-    <com.vitalii.s.a10tictactoe.GameViewStatic
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="480dp"
-        android:id="@+id/viewStatic"
-        android:layout_gravity="center" />
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
+
+        <com.vitalii.s.a10tictactoe.GameViewStatic
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/viewStatic"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/score"
+            android:id="@+id/scoreText"
+            android:layout_marginEnd="85dp"
+            android:contextClickable="false"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
 </FrameLayout>
