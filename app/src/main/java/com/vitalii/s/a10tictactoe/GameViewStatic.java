@@ -1,6 +1,7 @@
 package com.vitalii.s.a10tictactoe;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -28,12 +29,15 @@ import android.view.View;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.widget.Checkable;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,7 +71,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                         simplePlayGround.doStep(i, j);
                         postInvalidate();
                         if (simplePlayGround.getBoard().hasWon(Seed.CROSS)) {
-                            compWin++;
+                            playerWin++;
                             streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                             showWinner();
                             mSoundPool.stop(streamId);
@@ -141,7 +145,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
         }
     }
-
+    private Context context;
     private Rect[][] rects = new Rect[3][3];
     private static final int size = 3;
     private Paint mPaint;
@@ -165,11 +169,13 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     final List<Target> targets = new ArrayList<>();
     public static int playerWin;
     public static int compWin;
+    public TextView textView;
 
 
 
     public GameViewStatic(Context context) {
         super(context);
+        this.context=context;
         mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
         mSoundPool.setOnLoadCompleteListener(this);
         soundID = mSoundPool.load(context, R.raw.win, 1);
@@ -180,6 +186,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     // эти два конструктора нужны , если будем использовать вместе с кнопками
     public GameViewStatic(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.context=context;
         mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
         mSoundPool.setOnLoadCompleteListener(this);
         soundID = mSoundPool.load(context, R.raw.win, 1);
@@ -189,6 +196,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     // то есть если будем добавлять наш GameViewStatic как customView чере разметку
     public GameViewStatic(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        this.context=context;
         mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
         mSoundPool.setOnLoadCompleteListener(this);
         soundID = mSoundPool.load(context, R.raw.win, 1);
@@ -196,7 +204,6 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     }
 
     public void init() {
-
         mPaint = new Paint();
         mPaint.setColor(Color.BLACK);
         mPaint.setStrokeWidth(10);
@@ -258,7 +265,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     @Override
     protected void onDraw(Canvas canvas) {
         if (bitmap != null) {
-
+            textView = (TextView) ((Activity)context).findViewById(R.id.scoreText);
+            textView.setText("Srore:"+playerWin+":"+compWin);
             final float scaleFactorX;
             final float scaleFactorY;
 
@@ -482,7 +490,6 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         bot = new Gson().fromJson(ss.savedBot, Bot.class);
         this.playerWin = ss.playerWin;
         this.compWin = ss.compWin;
-
 
 
     }

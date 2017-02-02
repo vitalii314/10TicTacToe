@@ -23,14 +23,9 @@ public class MainActivity extends Activity {
         //gameView.setId(R.id.viewStatic);
        // setContentView(gameView); //- если только gameView - без кнопок и др элементов
         setContentView(R.layout.activity_main);
-
-        Toast.makeText(this,"Multiplayer mode is being developed",Toast.LENGTH_LONG).show();
         gameView = (GameViewStatic)findViewById(R.id.viewStatic);
         scoreText = (TextView) findViewById(R.id.scoreText);
         scoreText.setText("Score:" + GameViewStatic.playerWin+":"+GameViewStatic.compWin);
-        Toast.makeText(this,"Score restored", Toast.LENGTH_LONG).show();
-
-
     }
 
 
