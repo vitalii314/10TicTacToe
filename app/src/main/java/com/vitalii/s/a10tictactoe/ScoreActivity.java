@@ -1,5 +1,6 @@
 package com.vitalii.s.a10tictactoe;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +26,6 @@ public class ScoreActivity extends AppCompatActivity {
         setContentView(R.layout.activity_score);
         mDbHelper = new HotelDbHelper(this);
         mName = (TextView)findViewById(R.id.textName);
-        mScore = (TextView)findViewById(R.id.textScore);
 
 
     }
@@ -33,6 +33,7 @@ public class ScoreActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        insertGuest();
         displayDatabaseInfo();
     }
 
@@ -43,9 +44,12 @@ public class ScoreActivity extends AppCompatActivity {
 
         // Зададим условие для выборки - список столбцов
         String[] projection = {
-                HoteContract.BestScore.COLUMN_NAME};
+                HoteContract.BestScore._ID,
+                HoteContract.BestScore.COLUMN_NAME,
+                HoteContract.BestScore.COLUMN_SCORE};
+
         String selection = HoteContract.BestScore._ID+">?";
-        String[] selectionArgs = {"1"};
+        String[] selectionArgs = {"0"};
 
 
         // Делаем запрос
@@ -87,6 +91,20 @@ public class ScoreActivity extends AppCompatActivity {
             // Всегда закрываем курсор после чтения
             cursor.close();
         }
+    }
+
+
+    private void insertGuest() {
+
+        // Gets the database in write mode
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        // Создаем объект ContentValues, где имена столбцов ключи,
+        // а информация о госте является значениями ключей
+        ContentValues values = new ContentValues();
+        values.put(HoteContract.BestScore.COLUMN_NAME, "Vitalik");
+        values.put(HoteContract.BestScore.COLUMN_SCORE, 100);
+
+        long newRowId = db.insert(HoteContract.BestScore.TABLE_NAME, null, values);
     }
 }
 

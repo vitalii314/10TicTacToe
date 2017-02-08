@@ -20,7 +20,9 @@ public class HotelDbHelper extends SQLiteOpenHelper {
     }
 
 
-
+    /**
+     * Вызывается при создании базы данных
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         String SQL_CREATE_GUESTS_TABLE = "CREATE TABLE " + HoteContract.BestScore.TABLE_NAME + " ("

@@ -23,7 +23,7 @@
         </activity>
         <activity android:name=".ScoreActivity"
             android:label="Best Score"
-                  android:theme="@style/Theme.AppCompat.Dialog">
+            android:theme="@style/Theme.AppCompat.Dialog">
         </activity>
     </application>
 
