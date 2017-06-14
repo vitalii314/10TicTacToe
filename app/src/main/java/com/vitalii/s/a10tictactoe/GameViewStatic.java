@@ -45,7 +45,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import playground.Board;
-import playground.Bot;
+import playground.Bot5.Bot5;
 import playground.Cell;
 import playground.Seed;
 import playground.SimplePlayGround;
@@ -100,7 +100,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             }
             if (simplePlayGround.isFinished() && !flag) {
                 simplePlayGround.start();
-                bot.start();
+                //bot.start();
                 postInvalidate();
 
             }
@@ -157,7 +157,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     float touchY = 0;
     private Bitmap bitmap;
     public SimplePlayGround simplePlayGround;
-    private Bot bot;
+    //private Bot bot;
     private boolean flag;
     private Thread gameThread;
     private boolean firstThread=false;
@@ -216,9 +216,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         mCrossPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStyle(Paint.Style.STROKE);
-        simplePlayGround = new SimplePlayGround();
+        simplePlayGround = new SimplePlayGround(3,3,3);
         simplePlayGround.start();
-        bot = new Bot();
+       // bot = new Bot();
         if (!firstThread) {
             playerWin = 0;
             compWin = 0;
@@ -416,7 +416,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
     public void makeBotMove() {
         if (simplePlayGround.getCurrentPlayer() == Seed.NOUGHT && !simplePlayGround.isFinished()) {
-            int[] compMove = bot.makeMove(simplePlayGround);
+            int[] compMove = Bot5.makeBotMove(Seed.NOUGHT,simplePlayGround,8);
             int a = compMove[0];
             int b = compMove[1];
             State state = simplePlayGround.doStep(a, b);
@@ -471,7 +471,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         Parcelable superState = super.onSaveInstanceState();
         SavedState ss = new SavedState(superState);
         ss.savedPlayground = new Gson().toJson(simplePlayGround);
-        ss.savedBot = new Gson().toJson(bot);
+        //ss.savedBot = new Gson().toJson(bot);
         ss.playerWin = this.playerWin;
         ss.compWin = this.compWin;
         return ss;
@@ -487,7 +487,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
         simplePlayGround = new Gson().fromJson(ss.savedPlayground, SimplePlayGround.class);
-        bot = new Gson().fromJson(ss.savedBot, Bot.class);
+        //bot = new Gson().fromJson(ss.savedBot, Bot.class);
         this.playerWin = ss.playerWin;
         this.compWin = ss.compWin;
 

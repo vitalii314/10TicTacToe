@@ -3,7 +3,15 @@ package playground;
 public class SimplePlayGround implements Playground {
     private Board board;
     private Seed currentPlayer = Seed.CROSS;
+    private int rows;
+    private int cols;
+    private int numberToWin;
 
+    public SimplePlayGround(int rows, int cols, int numberToWin) {
+        this.rows = rows;
+        this.cols = cols;
+        this.numberToWin=numberToWin;
+    }
 
     public Board getBoard() {
         return board;
@@ -14,8 +22,12 @@ public class SimplePlayGround implements Playground {
         return currentPlayer;
     }
 
+    public void setCurrentPlayer(Seed currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
     public void start() {
-        board = new Board();
+        board = new Board(rows,cols,numberToWin);
         currentPlayer = Seed.CROSS;
     }
 
@@ -75,7 +87,7 @@ public class SimplePlayGround implements Playground {
     }
 
     private boolean isMoveAllowed(int i, int j) {
-        if (!(i <= 2 && i >= 0 && j <= 2 && j >= 0)) {
+        if (!(i < this.rows && i >= 0 && j < this.cols && j >= 0)) {
             return false;
         }
         if (board.cells[i][j].content != Seed.EMPTY) {

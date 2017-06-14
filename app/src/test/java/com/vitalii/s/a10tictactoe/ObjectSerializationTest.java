@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  */
 public class ObjectSerializationTest {
 
-    SimplePlayGround simplePlayGround=new SimplePlayGround();
+    SimplePlayGround simplePlayGround=new SimplePlayGround(3,3,3);
     @Before
     public void init() {
 
@@ -27,7 +27,7 @@ public class ObjectSerializationTest {
     public void doesGsonWork() throws Exception {
 
         String gSon = new Gson().toJson(simplePlayGround);
-        SimplePlayGround newSimplePlayGround = new SimplePlayGround();
+        SimplePlayGround newSimplePlayGround = new SimplePlayGround(3,3,3);
         newSimplePlayGround = new Gson().fromJson(gSon, SimplePlayGround.class);
         assertEquals(newSimplePlayGround.getBoard().cells[1][1].content, Seed.CROSS);
     }
