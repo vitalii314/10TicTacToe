@@ -1,5 +1,8 @@
 package playground;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board {  // save as Board.java
     // Named-constants for the dimensions
     //public static final int ROWS = 3;
@@ -7,7 +10,7 @@ public class Board {  // save as Board.java
     public int ROWS;
     public int COLS;
     public int numberToWin;
-    public int[][] winningFields = new int[3][2];
+    public ArrayList winningFields ;
 
     // package access
     public Cell[][] cells;  // a board composes of ROWS-by-COLS Cell instances
@@ -20,6 +23,8 @@ public class Board {  // save as Board.java
         this.ROWS = rows;
         this.COLS = cols;
         this.numberToWin = numberToWin;
+        this.winningFields = new ArrayList<int[][]>();
+        //this.winningFields = new int[rows][2];
         cells = new Cell[ROWS][COLS];  // allocate the array
         for (int row = 0; row < ROWS; ++row) {
             for (int col = 0; col < COLS; ++col) {
@@ -48,121 +53,96 @@ public class Board {  // save as Board.java
      * (currentRow, currentCol)
      */
     public boolean hasWon(Seed theSeed) {
-//        if (cells[currentRow][0].content == theSeed         // 3-in-the-row
-//                && cells[currentRow][1].content == theSeed
-//                && cells[currentRow][2].content == theSeed) {
-//            winningFields[0][0] = currentRow;
-//            winningFields[0][1] = 0;
-//            winningFields[1][0] = currentRow;
-//            winningFields[2][0] = currentRow;
-//            winningFields[1][1] = 1;
-//            winningFields[2][1] = 2;
-//            return true;
 //
-//        }
-
         int count1 = 0;
-        while (((currentCol+count1+1)<COLS)&&
-                cells[currentRow][currentCol+ count1+1].content==theSeed) {
+        int winnigFieldsCount = 0;
+        winningFields.clear();
+        winningFields.add(new int[][]{{currentRow,currentCol}});
+        //horizontal
+        while (((currentCol + count1 + 1) < COLS) &&
+                cells[currentRow][currentCol + count1 + 1].content == theSeed) {
+
             count1++;
+            winningFields.add(new int[][]{{currentRow,currentCol + count1}});
+
         }
         int count2 = 0;
-        while ((currentCol-count2-1>=0)&&cells[currentRow][currentCol-count2-1].content==theSeed) {
+        while ((currentCol - count2 - 1 >= 0) && cells[currentRow][currentCol - count2 - 1].content == theSeed) {
             count2++;
+            winningFields.add(new int[][]{{currentRow,currentCol - count2}});
         }
-        if ((count1+count2)>=numberToWin-1&&
-                cells[currentRow][currentCol].content==theSeed) {
+        if ((count1 + count2) >= numberToWin - 1 &&
+                cells[currentRow][currentCol].content == theSeed) {
             return true;
         }
 
-
-//         if (cells[0][currentCol].content == theSeed      // 3-in-the-column
-//                && cells[1][currentCol].content == theSeed
-//                && cells[2][currentCol].content == theSeed) {
-//             winningFields[0][0] = 0;
-//             winningFields[0][1] = currentCol;
-//             winningFields[1][0] = 1;
-//             winningFields[1][1] = currentCol;
-//             winningFields[2][0] = 2;
-//             winningFields[2][1] = currentCol;
-//             return true;
-//         }
-
+        //vertikal
         count1 = 0;
-        while ((currentRow+count1+1)<ROWS&&
-                cells[currentRow+count1+1][currentCol].content==theSeed) {
+        winnigFieldsCount = 0;
+        winningFields.clear();
+        while ((currentRow + count1 + 1) < ROWS &&
+                cells[currentRow + count1 + 1][currentCol].content == theSeed) {
             count1++;
+            winningFields.add(new int[][]{{currentRow + count1,currentCol}});
         }
         count2 = 0;
-        while ((currentRow-count2-1)>=0&&
-                cells[currentRow-count2-1][currentCol].content==theSeed) {
+        while ((currentRow - count2 - 1) >= 0 &&
+                cells[currentRow - count2 - 1][currentCol].content == theSeed) {
             count2++;
+            winningFields.add(new int[][]{{currentRow - count2,currentCol}});
+
         }
-        if ((count1+count2)>=numberToWin-1&&
-                cells[currentRow][currentCol].content==theSeed) {
+        if ((count1 + count2) >= numberToWin - 1 &&
+                cells[currentRow][currentCol].content == theSeed) {
             return true;
         }
 
-
-//                if ( currentRow == currentCol            // 3-in-the-diagonal
-//                && cells[0][0].content == theSeed
-//                && cells[1][1].content == theSeed
-//                && cells[2][2].content == theSeed) {
-//                    winningFields[0][0]=0;
-//                    winningFields[0][1]=0;
-//                    winningFields[1][0]=1;
-//                    winningFields[1][1]= 1;
-//                    winningFields[2][0] = 2;
-//                    winningFields[2][1] = 2;
-//                    return  true;
-//                }
-//                if ( currentRow + currentCol == 2    // 3-in-the-opposite-diagonal
-//                && cells[0][2].content == theSeed
-//                && cells[1][1].content == theSeed
-//                && cells[2][0].content == theSeed) {
-//                    winningFields[0][0]=0;
-//                    winningFields[0][1]=2;
-//                    winningFields[1][0]=1;
-//                    winningFields[1][1]=1;
-//                    winningFields[2][0]=2;
-//                    winningFields[2][1]=0;
-//                    return true;
-//                }
 
         //diagonal 1
         count1 = 0;
-        while ((currentRow+count1+1)<ROWS&&(currentCol+count1+1)<COLS&&
-                cells[currentRow+count1+1][currentCol+count1+1].content==theSeed) {
+        winnigFieldsCount=0;
+        winningFields.clear();
+        while ((currentRow + count1 + 1) < ROWS && (currentCol + count1 + 1) < COLS &&
+                cells[currentRow + count1 + 1][currentCol + count1 + 1].content == theSeed) {
             count1++;
+            winningFields.add(new int[][]{{currentRow + count1,currentCol + count1}});
         }
         count2 = 0;
-        while ((currentRow-count2-1)>=0&&(currentCol-count2-1)>=0&&
-                cells[currentRow-count2-1][currentCol-count2-1].content==theSeed) {
+        while ((currentRow - count2 - 1) >= 0 && (currentCol - count2 - 1) >= 0 &&
+                cells[currentRow - count2 - 1][currentCol - count2 - 1].content == theSeed) {
             count2++;
+            winningFields.add(new int[][]{{currentRow - count2,currentCol - count2}});
         }
-        if ((count1+count2)>=numberToWin-1&&
-                cells[currentRow][currentCol].content==theSeed) {
+        if ((count1 + count2) >= numberToWin - 1 &&
+                cells[currentRow][currentCol].content == theSeed) {
             return true;
         }
 
         //diagonal 2
         count1 = 0;
-        while ((currentRow-count1-1)>=0&&(currentCol+count1+1)<COLS&&
-                cells[currentRow-count1-1][currentCol+count1+1].content==theSeed) {
+        winnigFieldsCount=0;
+        winningFields.clear();
+        while ((currentRow - count1 - 1) >= 0 && (currentCol + count1 + 1) < COLS &&
+                cells[currentRow - count1 - 1][currentCol + count1 + 1].content == theSeed) {
             count1++;
+            winningFields.add(new int[][]{{currentRow - count1,currentCol + count1 }});
+
         }
         count2 = 0;
-        while ((currentRow+count2+1)<ROWS&&(currentCol-count2-1)>=0&&
-                cells[currentRow+count2+1][currentCol-count2-1].content==theSeed) {
+        while ((currentRow + count2 + 1) < ROWS && (currentCol - count2 - 1) >= 0 &&
+                cells[currentRow + count2 + 1][currentCol - count2 - 1].content == theSeed) {
             count2++;
+            winningFields.add(new int[][]{{currentRow + count2,currentCol - count2 }});
+
         }
-        if ((count1+count2)>=numberToWin-1&&
-                cells[currentRow][currentCol].content==theSeed) {
+        if ((count1 + count2) >= numberToWin - 1 &&
+                cells[currentRow][currentCol].content == theSeed) {
             return true;
         }
 
         return false;
     }
+
 
     /**
      * Paint itself

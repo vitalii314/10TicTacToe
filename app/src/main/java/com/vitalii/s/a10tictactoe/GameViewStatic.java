@@ -40,6 +40,7 @@ import com.squareup.picasso.Target;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -110,16 +111,13 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
 
             winningFields = simplePlayGround.getBoard().winningFields;
-            int x1 = winningFields[0][0];
-            int y1 = winningFields[0][1];
-            int x2 = winningFields[1][0];
-            int y2 = winningFields[1][1];
-            int x3 = winningFields[2][0];
-            int y3 = winningFields[2][1];
-            Seed tempContent1 = simplePlayGround.getBoard().cells[x1][y1].content;
-            Seed tempContent2 = simplePlayGround.getBoard().cells[x2][y2].content;
-            Seed tempContent3 = simplePlayGround.getBoard().cells[x3][y3].content;
-
+            Seed[] tempSeed = new Seed[winningFields.size()];
+            for (int i = 0; i < winningFields.size(); i++) {
+                int[][] tempArr = (int[][]) winningFields.get(i);
+                tempSeed[i] = simplePlayGround.getBoard().
+                        cells[tempArr[0][0]][tempArr[0][1]].content;
+            }
+//
 
             for (int i = 0; i < 3; i++) {
                 try {
@@ -127,27 +125,36 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                 } catch (InterruptedException e) {
                 }
 
-                simplePlayGround.getBoard().cells[x1][y1].content = Seed.EMPTY;
-                simplePlayGround.getBoard().cells[x2][y2].content = Seed.EMPTY;
-                simplePlayGround.getBoard().cells[x3][y3].content = Seed.EMPTY;
+                for (int k = 0; k < winningFields.size(); k++) {
+                    int[][] tempArr = (int[][])winningFields.get(k);
+                    simplePlayGround.getBoard().
+                            cells[tempArr[0][0]][tempArr[0][1]].content = Seed.EMPTY;
+
+                }
+//
                 postInvalidate();
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                 }
 
-                simplePlayGround.getBoard().cells[x1][y1].content = tempContent1;
-                simplePlayGround.getBoard().cells[x2][y2].content = tempContent2;
-                simplePlayGround.getBoard().cells[x3][y3].content = tempContent3;
+                for (int k = 0; k < tempSeed.length; k++) {
+                    int[][] tempArr = (int[][])winningFields.get(k);
+                    simplePlayGround.getBoard().
+                            cells[tempArr[0][0]][tempArr[0][1]].content = tempSeed[k];
+
+                }
+//
                 postInvalidate();
             }
 
 
         }
     }
+
+    private int[] boardSize = {10, 10, 5, 3};
     private Context context;
-    private Rect[][] rects = new Rect[3][3];
-    private static final int size = 3;
+    private Rect[][] rects = new Rect[boardSize[0]][boardSize[1]];
     private Paint mPaint;
     private Paint mCirclePaint;
     private Paint mCrossPaint;
@@ -160,8 +167,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     //private Bot bot;
     private boolean flag;
     private Thread gameThread;
-    private boolean firstThread=false;
-    private int[][] winningFields;
+    private boolean firstThread = false;
+    private ArrayList winningFields = new ArrayList<>();
     private SoundPool mSoundPool;
     private int soundID;
     private int streamId;
@@ -172,10 +179,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public TextView textView;
 
 
-
     public GameViewStatic(Context context) {
         super(context);
-        this.context=context;
+        this.context = context;
         mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
         mSoundPool.setOnLoadCompleteListener(this);
         soundID = mSoundPool.load(context, R.raw.win, 1);
@@ -186,7 +192,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     // эти два конструктора нужны , если будем использовать вместе с кнопками
     public GameViewStatic(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.context=context;
+        this.context = context;
         mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
         mSoundPool.setOnLoadCompleteListener(this);
         soundID = mSoundPool.load(context, R.raw.win, 1);
@@ -196,7 +202,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     // то есть если будем добавлять наш GameViewStatic как customView чере разметку
     public GameViewStatic(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        this.context=context;
+        this.context = context;
         mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
         mSoundPool.setOnLoadCompleteListener(this);
         soundID = mSoundPool.load(context, R.raw.win, 1);
@@ -216,9 +222,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         mCrossPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStyle(Paint.Style.STROKE);
-        simplePlayGround = new SimplePlayGround(3,3,3);
+        simplePlayGround = new SimplePlayGround(boardSize[0], boardSize[1], boardSize[2]);
         simplePlayGround.start();
-       // bot = new Bot();
+        // bot = new Bot();
         if (!firstThread) {
             playerWin = 0;
             compWin = 0;
@@ -251,7 +257,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
         targets.add(mTarget);
         Picasso.with(getContext()).load(R.drawable.kletka3).
-                memoryPolicy(MemoryPolicy.NO_STORE,MemoryPolicy.NO_CACHE).into(targets.get(0));
+                memoryPolicy(MemoryPolicy.NO_STORE, MemoryPolicy.NO_CACHE).into(targets.get(0));
 
     }
 
@@ -265,10 +271,11 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     @Override
     protected void onDraw(Canvas canvas) {
         if (bitmap != null) {
-            textView = (TextView) ((Activity)context).findViewById(R.id.scoreText);
-            textView.setText("Srore:"+playerWin+":"+compWin);
+            textView = (TextView) ((Activity) context).findViewById(R.id.scoreText);
+            textView.setText("Srore:" + playerWin + ":" + compWin);
             final float scaleFactorX;
             final float scaleFactorY;
+            int size = simplePlayGround.getBoard().cells.length;
 
             if (getWidth() > WIDTH || getHeight() > HEIGHT) {
                 scaleFactorX = (float) getWidth() / WIDTH;
@@ -283,52 +290,99 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             canvas.drawBitmap(bitmap, 0, 0, null);
             canvas.restoreToCount(savedState);
 
-            float fieldLength = getWidth() / 2;
+            float fieldLength = (getWidth()-10);
 
-            float startPosX1 = (getWidth() - fieldLength) / 2 + fieldLength / size;
-            float startPosY1 = (getHeight() - fieldLength) / 2;
-            float startPosX2 = startPosX1;
-            float startPosY2 = startPosY1 + fieldLength;
-            canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
+//            float startPosX1 = (getWidth() - fieldLength) / 2 + fieldLength / size;
+//            float startPosY1 = (getHeight() - fieldLength) / 2;
+//            float startPosX2 = startPosX1;
+//            float startPosY2 = startPosY1 + fieldLength;
+//            canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
+//
+//            float startPosX3 = startPosX1 + fieldLength / size;
+//            float startPosY3 = startPosY1;
+//            float startPosX4 = startPosX3;
+//            float startPosY4 = startPosY1 + fieldLength;
+//            canvas.drawLine(startPosX3, startPosY3, startPosX4, startPosY4, mPaint);
+//
+//            float startPosX5 = (getWidth() - fieldLength) / 2;
+//            float startPosY5 = (getHeight() / 2) - fieldLength / size / 2;
+//            float startPosX6 = startPosX5 + fieldLength;
+//            float startPosY6 = startPosY5;
+//            canvas.drawLine(startPosX5, startPosY5, startPosX6, startPosY6, mPaint);
+//
+//            float startPosX7 = startPosX5;
+//            float startPosY7 = (getHeight() / 2) + fieldLength / size / 2;
+//            float startPosX8 = startPosX7 + fieldLength;
+//            float startPosY8 = startPosY7;
+//            canvas.drawLine(startPosX7, startPosY7, startPosX8, startPosY8, mPaint);
 
-            float startPosX3 = startPosX1 + fieldLength / size;
-            float startPosY3 = startPosY1;
-            float startPosX4 = startPosX3;
-            float startPosY4 = startPosY1 + fieldLength;
-            canvas.drawLine(startPosX3, startPosY3, startPosX4, startPosY4, mPaint);
 
-            float startPosX5 = (getWidth() - fieldLength) / 2;
-            float startPosY5 = (getHeight() / 2) - fieldLength / size / 2;
-            float startPosX6 = startPosX5 + fieldLength;
-            float startPosY6 = startPosY5;
-            canvas.drawLine(startPosX5, startPosY5, startPosX6, startPosY6, mPaint);
+            // drawing vertikal lines
 
-            float startPosX7 = startPosX5;
-            float startPosY7 = (getHeight() / 2) + fieldLength / size / 2;
-            float startPosX8 = startPosX7 + fieldLength;
-            float startPosY8 = startPosY7;
-            canvas.drawLine(startPosX7, startPosY7, startPosX8, startPosY8, mPaint);
+            for (int i = 0; i < simplePlayGround.getBoard().cells.length - 1; i++) {
+                float startPosX1;
+                float startPosY1 = (getHeight() - fieldLength) / 2;
+                float startPosY2 = startPosY1 + fieldLength;
 
-            if (rects[0][0] == null) {
-                rects[0][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 - fieldLength / size),
-                        (int) startPosX1, (int) startPosY5);
-                rects[0][1] = new Rect((int) startPosX1, (int) (startPosY5 - fieldLength / size),
-                        (int) (startPosX1 + fieldLength / size), (int) startPosY5);
-                rects[0][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 - fieldLength / size),
-                        (int) (startPosX1 + 2 * fieldLength / size), (int) startPosY5);
-                rects[1][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) startPosY5,
-                        (int) startPosX1, (int) (startPosY5 + fieldLength / size));
-                rects[1][1] = new Rect((int) startPosX1, (int) startPosY5,
-                        (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size));
-                rects[1][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) startPosY5,
-                        (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size));
-                rects[2][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 + fieldLength / size),
-                        (int) startPosX1, (int) (startPosY5 + fieldLength / size * 2));
-                rects[2][1] = new Rect((int) startPosX1, (int) (startPosY5 + fieldLength / size),
-                        (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
-                rects[2][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size),
-                        (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
+                if (i == 0) {
+                    startPosX1 = (getWidth() - fieldLength) / 2 + fieldLength / size;
+                } else {
+                    startPosX1 = (getWidth() - fieldLength) / 2 + (i + 1) * fieldLength / size;
+                }
+                float startPosX2 = startPosX1;
+                canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
+
             }
+
+            // drawing horizontal lines
+            for (int i = 0; i < simplePlayGround.getBoard().cells.length - 1; i++) {
+
+                float startPosX1 = (getWidth() - fieldLength) / 2;
+                float startPosX2 = startPosX1 + fieldLength;
+                float startPosY1 = ((getHeight() / 2) - fieldLength / 2) + (i + 1) * fieldLength / size;
+                float startPosY2 = startPosY1;
+                canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
+
+
+            }
+            // filling rects
+            if (rects[0][0] == null) {
+                for (int i = 0; i < size; i++) {
+                    float startPosY1 = (getHeight() - fieldLength) / 2;
+                    for (int j = 0; j < size; j++) {
+
+                        float startPosX1 = (getWidth() - fieldLength) / 2 + (j + 1) * fieldLength / size;
+
+                        rects[i][j] = new Rect((int) (startPosX1 - fieldLength / size),
+                                (int) (startPosY1 + i * (fieldLength / size)),
+                                (int) (startPosX1),
+                                ((int) (startPosY1 + (i + 1) * (fieldLength / size))));
+
+                    }
+
+                }
+
+            }
+//            if (rects[0][0] == null) {
+//                rects[0][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 - fieldLength / size),
+//                        (int) startPosX1, (int) startPosY5);
+//                rects[0][1] = new Rect((int) startPosX1, (int) (startPosY5 - fieldLength / size),
+//                        (int) (startPosX1 + fieldLength / size), (int) startPosY5);
+//                rects[0][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 - fieldLength / size),
+//                        (int) (startPosX1 + 2 * fieldLength / size), (int) startPosY5);
+//                rects[1][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) startPosY5,
+//                        (int) startPosX1, (int) (startPosY5 + fieldLength / size));
+//                rects[1][1] = new Rect((int) startPosX1, (int) startPosY5,
+//                        (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size));
+//                rects[1][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) startPosY5,
+//                        (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size));
+//                rects[2][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 + fieldLength / size),
+//                        (int) startPosX1, (int) (startPosY5 + fieldLength / size * 2));
+//                rects[2][1] = new Rect((int) startPosX1, (int) (startPosY5 + fieldLength / size),
+//                        (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
+//                rects[2][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size),
+//                        (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
+//            }
 
 
             for (int i = 0; i < rects.length; i++) {
@@ -370,53 +424,38 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
 
     public void drawCirlce(Canvas canvas, int x, int y) {
+        int size = simplePlayGround.getBoard().cells.length;
         Path circlePath = new Path();
-        circlePath.addCircle(x, y, (getWidth() / 2 / size - 30) / 2, Path.Direction.CW);
+        float offset = (float) getWidth() / 2 / size / 3.9f;
+        circlePath.addCircle(x, y, (getWidth() / 2 / size - offset) / 2, Path.Direction.CW);
         canvas.drawPath(circlePath, mCirclePaint);
 
     }
 
     public void drawCross(Canvas canvas, int x, int y) {
-        float x1 = (x - (getWidth() / 2 / size / 2 - 15));
-        float y1 = (y - (getWidth() / 2 / size / 2 - 15));
-        float x2 = (x + (getWidth() / 2 / size / 2 - 15));
-        float y2 = (y + (getWidth() / 2 / size / 2 - 15));
+
+        int size = simplePlayGround.getBoard().cells.length;
+        float offset = (float) getWidth() / 2 / size / 3.9f / 2;
+
+        float x1 = (x - (getWidth() / 2 / size / 2 - offset));
+        float y1 = (y - (getWidth() / 2 / size / 2 - offset));
+        float x2 = (x + (getWidth() / 2 / size / 2 - offset));
+        float y2 = (y + (getWidth() / 2 / size / 2 - offset));
         canvas.drawLine(x1, y1, x2, y2, mCrossPaint);
 
-        float x3 = (x + (getWidth() / 2 / size / 2 - 15));
-        float y3 = (y - (getWidth() / 2 / size / 2 - 15));
-        float x4 = (x - (getWidth() / 2 / size / 2 - 15));
-        float y4 = (y + (getWidth() / 2 / size / 2 - 15));
+        float x3 = (x + (getWidth() / 2 / size / 2 - offset));
+        float y3 = (y - (getWidth() / 2 / size / 2 - offset));
+        float x4 = (x - (getWidth() / 2 / size / 2 - offset));
+        float y4 = (y + (getWidth() / 2 / size / 2 - offset));
 
         canvas.drawLine(x3, y3, x4, y4, mCrossPaint);
         canvas.drawLine(x3, y3, x4, y4, mCrossPaint);
     }
-
-    public int[][] findWinningRects() {
-        int[][] winningRects = new int[3][2];
-        if (this.simplePlayGround.getBoard().cells[0][0].content == Seed.CROSS
-                && this.simplePlayGround.getBoard().cells[0][1].content == Seed.CROSS
-                && this.simplePlayGround.getBoard().cells[0][2].content == Seed.CROSS
-                || this.simplePlayGround.getBoard().cells[1][0].content == Seed.NOUGHT
-                && this.simplePlayGround.getBoard().cells[1][1].content == Seed.NOUGHT
-                && this.simplePlayGround.getBoard().cells[1][2].content == Seed.NOUGHT) {
-            winningRects[0][0] = 0;
-            winningRects[0][1] = 0;
-            winningRects[1][0] = 0;
-            winningRects[1][1] = 1;
-            winningRects[2][0] = 0;
-            winningRects[2][1] = 2;
-
-
-        }
-        return winningRects;
-    }
-
 
 
     public void makeBotMove() {
         if (simplePlayGround.getCurrentPlayer() == Seed.NOUGHT && !simplePlayGround.isFinished()) {
-            int[] compMove = Bot5.makeBotMove(Seed.NOUGHT,simplePlayGround,8);
+            int[] compMove = Bot5.makeBotMove(Seed.NOUGHT, simplePlayGround, boardSize[3]);
             int a = compMove[0];
             int b = compMove[1];
             State state = simplePlayGround.doStep(a, b);
