@@ -80,11 +80,20 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                         }
 
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(100);
                         } catch (InterruptedException e) {
                         }
                         if (!simplePlayGround.isFinished()) {
+                            long start = System.nanoTime();
                             makeBotMove();
+                            long finish = System.nanoTime();
+                            if ((finish - start) / 1000000 < 600) {
+                                long diff = 600 - (finish - start) / 1000000;
+                                try {
+                                    Thread.sleep(diff);
+                                } catch (InterruptedException e) {
+                                }
+                            }
                             postInvalidate();
                             if (simplePlayGround.getBoard().hasWon(Seed.NOUGHT)) {
                                 compWin++;
@@ -126,7 +135,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                 }
 
                 for (int k = 0; k < winningFields.size(); k++) {
-                    int[][] tempArr = (int[][])winningFields.get(k);
+                    int[][] tempArr = (int[][]) winningFields.get(k);
                     simplePlayGround.getBoard().
                             cells[tempArr[0][0]][tempArr[0][1]].content = Seed.EMPTY;
 
@@ -139,7 +148,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                 }
 
                 for (int k = 0; k < tempSeed.length; k++) {
-                    int[][] tempArr = (int[][])winningFields.get(k);
+                    int[][] tempArr = (int[][]) winningFields.get(k);
                     simplePlayGround.getBoard().
                             cells[tempArr[0][0]][tempArr[0][1]].content = tempSeed[k];
 
@@ -290,7 +299,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             canvas.drawBitmap(bitmap, 0, 0, null);
             canvas.restoreToCount(savedState);
 
-            float fieldLength = (getWidth()-10);
+            float fieldLength = (getWidth() - 10);
 
 //            float startPosX1 = (getWidth() - fieldLength) / 2 + fieldLength / size;
 //            float startPosY1 = (getHeight() - fieldLength) / 2;

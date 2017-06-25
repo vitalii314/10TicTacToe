@@ -80,6 +80,7 @@ public class Board {  // save as Board.java
         count1 = 0;
         winnigFieldsCount = 0;
         winningFields.clear();
+        winningFields.add(new int[][]{{currentRow,currentCol}});
         while ((currentRow + count1 + 1) < ROWS &&
                 cells[currentRow + count1 + 1][currentCol].content == theSeed) {
             count1++;
@@ -102,6 +103,7 @@ public class Board {  // save as Board.java
         count1 = 0;
         winnigFieldsCount=0;
         winningFields.clear();
+        winningFields.add(new int[][]{{currentRow,currentCol}});
         while ((currentRow + count1 + 1) < ROWS && (currentCol + count1 + 1) < COLS &&
                 cells[currentRow + count1 + 1][currentCol + count1 + 1].content == theSeed) {
             count1++;
@@ -122,6 +124,7 @@ public class Board {  // save as Board.java
         count1 = 0;
         winnigFieldsCount=0;
         winningFields.clear();
+        winningFields.add(new int[][]{{currentRow,currentCol}});
         while ((currentRow - count1 - 1) >= 0 && (currentCol + count1 + 1) < COLS &&
                 cells[currentRow - count1 - 1][currentCol + count1 + 1].content == theSeed) {
             count1++;

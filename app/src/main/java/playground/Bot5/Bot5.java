@@ -17,7 +17,7 @@ import java.util.List;
  * Max recommended depth for playground 3x3 with 3 in row to win - 8
  * Max recommended depth for playground 10x10 with 5 in row to win - 3
  */
-public  class Bot5  {
+public class Bot5 {
     static List<int[][]> randomMoveList = new ArrayList<int[][]>();
     private static int depth = 3;
     private static SimplePlayGround playGround;
@@ -76,15 +76,15 @@ public  class Bot5  {
                     seed == Seed.CROSS ? Seed.NOUGHT : Seed.CROSS, tempMoves[count - 1][0], tempMoves[count - 1][1]);
         }
 
-        //int score = (count + 1) % 2 == 0 ? 1000 : -1000;  //without alpha beta
-        int score = (count + 1) % 2 == 0 ? beta : alpha;
+        int score = (count + 1) % 2 == 0 ? 1000 : -1000;  //without alpha beta
+        //int score = (count + 1) % 2 == 0 ? beta : alpha;
         boolean flag = (count + 1) % 2 == 0 ? true : false;
 
 
         for (int i = 0; i < playGround.getBoard().cells.length; i++) {
             for (int j = 0; j < playGround.getBoard().cells[i].length; j++) {
                 if (playGround.getBoard().cells[i][j].content == Seed.EMPTY &&
-                        !playGround.isFinished()) {
+                        !playGround.isFinished() && isThereEmptyFieldNear(i, j)) {
                     count++;
                     mFlag = false;
 
@@ -118,11 +118,11 @@ public  class Bot5  {
 
                         if (s < score) {
                             score = s;
-                            if (score < alpha) {
-                                mFlag = flag;
-                                mWasFinished = false;
-                                return score;
-                            }
+                        }
+                        if (score < alpha) {
+                            mFlag = flag;
+                            mWasFinished = false;
+                            return score;
                         }
                     } else {
 
@@ -148,13 +148,6 @@ public  class Bot5  {
 
                             score = s;
 
-                            if (score > beta) {
-
-                                mFlag = flag;
-                                mWasFinished = false;
-                                return score;
-
-                            }
                             if (count == 0) {
                                 move[0] = tempMoves[0][0];
                                 move[1] = tempMoves[0][1];
@@ -163,6 +156,14 @@ public  class Bot5  {
                                 randomMoveList.add(tempArr);
 
                             }
+
+                        }
+
+                        if (score > beta) {
+
+                            mFlag = flag;
+                            mWasFinished = false;
+                            return score;
 
                         }
 
@@ -493,6 +494,21 @@ public  class Bot5  {
             return -(countTotalPlayer + countTotalOpp);
         }
 
+    }
+
+    public static boolean isThereEmptyFieldNear(int i, int j) {
+
+        int[][] firstRing = {{-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}};
+
+        for (int k = 0; k < firstRing.length; k++) {
+            if (i + firstRing[k][0] >= 0 && i + firstRing[k][0] < playGround.getBoard().cells.length &&
+                    j + firstRing[k][1] >= 0 && j + firstRing[k][1] < playGround.getBoard().cells[i].length &&
+                    playGround.getBoard().cells[i + firstRing[k][0]][j + firstRing[k][1]].content != Seed.EMPTY) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static int[] makeBotMove(Seed seed, SimplePlayGround playGround1, int depth1) {
