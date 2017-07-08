@@ -19,7 +19,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //GameViewStatic gameView = new GameViewStatic(this);
         //gameView.setId(R.id.viewStatic);
        // setContentView(gameView); //- если только gameView - без кнопок и др элементов
         setContentView(R.layout.activity_main);
@@ -40,6 +39,8 @@ public class MainActivity extends Activity {
 //        Toast.makeText(this,"restored",Toast.LENGTH_LONG).show();
 //
 //    }
+
+
 
 
 }

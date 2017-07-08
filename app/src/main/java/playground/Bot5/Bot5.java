@@ -4,6 +4,8 @@ package playground.Bot5;
  * Created by user on 10.02.2017.
  */
 
+import com.google.gson.Gson;
+
 import playground.Seed;
 import playground.SimplePlayGround;
 
@@ -18,14 +20,14 @@ import java.util.List;
  * Max recommended depth for playground 10x10 with 5 in row to win - 3
  */
 public class Bot5 {
-    static List<int[][]> randomMoveList = new ArrayList<int[][]>();
-    private static int depth = 3;
-    private static SimplePlayGround playGround;
-    private static int[] move = new int[2];
-    static int[][] tempMoves;
-    static int count = 0;
-    private static boolean mFlag;  // this variables are used to adopt random move selection
-    private static boolean mWasFinished; //with alpha beta
+    List<int[][]> randomMoveList = new ArrayList<int[][]>();
+    private int depth ;
+    private  SimplePlayGround playGround;
+    private  int[] move = new int[2];
+    int[][] tempMoves;
+    int count = 0;
+    private  boolean mFlag;  // this variables are used to adopt random move selection
+    private  boolean mWasFinished; //with alpha beta
     // they determine if returning score is "fair"
 
     // standart maximin procedure, without alpha beta
@@ -69,7 +71,7 @@ public class Bot5 {
         return score;
     }
 
-    public static int maximinWithAlphaBeta(int alpha, int beta, Seed seed) {
+    public  int maximinWithAlphaBeta(int alpha, int beta, Seed seed) {
         if (count >= depth || playGround.isFinished()) {
             if (playGround.isFinished()) mWasFinished = true;
             return evaluateAdvanced(playGround,
@@ -84,7 +86,7 @@ public class Bot5 {
         for (int i = 0; i < playGround.getBoard().cells.length; i++) {
             for (int j = 0; j < playGround.getBoard().cells[i].length; j++) {
                 if (playGround.getBoard().cells[i][j].content == Seed.EMPTY &&
-                        !playGround.isFinished() && isThereEmptyFieldNear(i, j)) {
+                        !playGround.isFinished()) {// && isThereEmptyFieldNear(i, j)) {
                     count++;
                     mFlag = false;
 
@@ -208,7 +210,7 @@ public class Bot5 {
      * Also detects next move win both for player and opponent
      */
 
-    public static int evaluateAdvanced(SimplePlayGround playGround, Seed seed, int i, int j) {
+    public int evaluateAdvanced(SimplePlayGround playGround, Seed seed, int i, int j) {
         int countTotalPlayer;
         boolean isWinningNextMovePlayer = false;
         boolean isWinningNextMoveOpp = false;
@@ -496,7 +498,7 @@ public class Bot5 {
 
     }
 
-    public static boolean isThereEmptyFieldNear(int i, int j) {
+    public  boolean isThereEmptyFieldNear(int i, int j) {
 
         int[][] firstRing = {{-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}};
 
@@ -511,10 +513,11 @@ public class Bot5 {
         return false;
     }
 
-    public static int[] makeBotMove(Seed seed, SimplePlayGround playGround1, int depth1) {
-        playGround = playGround1;
+    public int[] makeBotMove(Seed seed, String GsonPlayGround, int depth1) {
+        playGround = new Gson().fromJson(GsonPlayGround,SimplePlayGround.class);
         depth = depth1;
         tempMoves = new int[depth][2];
+        count=0;
         maximinWithAlphaBeta(-1000, 1000, seed);
         int i = (int) (Math.random() * randomMoveList.size());
         move[0] = randomMoveList.get(i)[0][0];
