@@ -21,13 +21,13 @@ import java.util.List;
  */
 public class Bot5 {
     List<int[][]> randomMoveList = new ArrayList<int[][]>();
-    private int depth ;
-    private  SimplePlayGround playGround;
-    private  int[] move = new int[2];
+    private int depth;
+    private SimplePlayGround playGround;
+    private int[] move = new int[2];
     int[][] tempMoves;
     int count = 0;
-    private  boolean mFlag;  // this variables are used to adopt random move selection
-    private  boolean mWasFinished; //with alpha beta
+    private boolean mFlag;  // this variables are used to adopt random move selection
+    private boolean mWasFinished; //with alpha beta
     // they determine if returning score is "fair"
 
     // standart maximin procedure, without alpha beta
@@ -71,7 +71,7 @@ public class Bot5 {
         return score;
     }
 
-    public  int maximinWithAlphaBeta(int alpha, int beta, Seed seed) {
+    public int maximinWithAlphaBeta(int alpha, int beta, Seed seed) {
         if (count >= depth || playGround.isFinished()) {
             if (playGround.isFinished()) mWasFinished = true;
             return evaluateAdvanced(playGround,
@@ -85,6 +85,7 @@ public class Bot5 {
 
         for (int i = 0; i < playGround.getBoard().cells.length; i++) {
             for (int j = 0; j < playGround.getBoard().cells[i].length; j++) {
+                if (Thread.currentThread().isInterrupted()) return score;
                 if (playGround.getBoard().cells[i][j].content == Seed.EMPTY &&
                         !playGround.isFinished()) {// && isThereEmptyFieldNear(i, j)) {
                     count++;
@@ -98,7 +99,7 @@ public class Bot5 {
 
                     int s = maximinWithAlphaBeta((count % 2 != 0 ? score : alpha), (count % 2 != 0 ? beta : score),
                             seed == Seed.CROSS ? Seed.NOUGHT : Seed.CROSS);
-
+                    if (Thread.currentThread().isInterrupted()) return score;
                     count--;
 
 
@@ -498,7 +499,7 @@ public class Bot5 {
 
     }
 
-    public  boolean isThereEmptyFieldNear(int i, int j) {
+    public boolean isThereEmptyFieldNear(int i, int j) {
 
         int[][] firstRing = {{-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}};
 
@@ -514,10 +515,10 @@ public class Bot5 {
     }
 
     public int[] makeBotMove(Seed seed, String GsonPlayGround, int depth1) {
-        playGround = new Gson().fromJson(GsonPlayGround,SimplePlayGround.class);
+        playGround = new Gson().fromJson(GsonPlayGround, SimplePlayGround.class);
         depth = depth1;
         tempMoves = new int[depth][2];
-        count=0;
+        count = 0;
         maximinWithAlphaBeta(-1000, 1000, seed);
         int i = (int) (Math.random() * randomMoveList.size());
         move[0] = randomMoveList.get(i)[0][0];
