@@ -87,7 +87,7 @@ public class Bot5 {
             for (int j = 0; j < playGround.getBoard().cells[i].length; j++) {
                 if (Thread.currentThread().isInterrupted()) return score;
                 if (playGround.getBoard().cells[i][j].content == Seed.EMPTY &&
-                        !playGround.isFinished()) {// && isThereEmptyFieldNear(i, j)) {
+                        !playGround.isFinished()) { // && isThereEmptyFieldNear(i, j)) {
                     count++;
                     mFlag = false;
 

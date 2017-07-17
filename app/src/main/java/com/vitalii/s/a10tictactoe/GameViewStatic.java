@@ -69,6 +69,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         @Override
         public void run() {
 
+
             try {
                 String value = queue.take();
             } catch (InterruptedException e) {
@@ -91,6 +92,12 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                             && simplePlayGround.getCurrentPlayer() == Seed.CROSS
                             && simplePlayGround.getBoard().cells[i][j].content == Seed.EMPTY) {
                         simplePlayGround.doStep(i, j);
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(),"MAKING PLAYER MOVE", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         postInvalidate();
                         if (simplePlayGround.getBoard().hasWon(Seed.CROSS)) {
                             playerWin++;
@@ -202,6 +209,15 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
     }
 
+    public void startNewGameThread() {
+        touchX=0.0f;
+        touchY=0.0f;
+        if (gameThread.isAlive()) gameThread.interrupt();
+        gameThread = new GameThread();
+        gameThread.start();
+
+    }
+
 
     final BlockingQueue<String> queue = new ArrayBlockingQueue<>(1);
     private int[] boardSize = {10, 10, 5, 3}; //playground rows, cols, number to win,depth
@@ -215,10 +231,10 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     float touchX = 0;
     float touchY = 0;
     private Bitmap bitmap;
-    private SimplePlayGround simplePlayGround;
+    SimplePlayGround simplePlayGround;
     private Bot5 bot;
     private boolean flag;
-    private GameThread gameThread = new GameThread();
+    GameThread gameThread = new GameThread();
     private boolean firstThread = false;
     private ArrayList winningFields = new ArrayList<>();
     private SoundPool mSoundPool;
@@ -354,10 +370,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             int orient = getContext().getResources().getConfiguration().orientation;
             if (orient == 1) {
                 fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getWidth() - 10) : (getWidth() / 2));
-                Toast.makeText(getContext(), "orientation = " + orient, Toast.LENGTH_SHORT).show();
             } else {
                 fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getHeight() - 10) : getHeight() / 2);
-                Toast.makeText(getContext(), "orientation = " + orient, Toast.LENGTH_SHORT).show();
 
             }
 
@@ -532,9 +546,10 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             int[] compMove = bot.makeBotMove(Seed.NOUGHT, s, boardSize[3]);
             int a = compMove[0];
             int b = compMove[1];
-            System.out.println("MAKING BOT MOVE");
-
-            State state = simplePlayGround.doStep(a, b);
+            if (!Thread.currentThread().isInterrupted()) {
+                System.out.println(" BOT MADE MOVE");
+                State state = simplePlayGround.doStep(a, b);
+            }
 
 
         }
@@ -599,8 +614,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        gameThread.interrupt();
-        Toast.makeText(getContext(),"ON DETACH",Toast.LENGTH_SHORT).show();
+        if (gameThread.isAlive()) gameThread.interrupt();
+        Toast.makeText(getContext(), "ON DETACH", Toast.LENGTH_SHORT).show();
     }
 
     @Override
