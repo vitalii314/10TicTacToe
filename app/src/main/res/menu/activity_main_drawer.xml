@@ -2,33 +2,34 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--<group android:checkableBehavior="single">-->
-    <item
-        android:id="@+id/nav_new_game"
-        android:title="New game">
-        <menu>
-            <group android:checkableBehavior="single">
-            <item android:id="@+id/nav_new_game_cross"
-                android:title="Play cross"/>
-            <item android:id="@+id/nav_new_game_nought"
-                android:title="Play nought"/>
-            </group>
+    <group android:id="@+id/group1">
+        <item
+            android:id="@+id/nav_new_game"
+            android:title="New game">
 
-        </menu>
-
-    </item>
+        </item>
+    </group>
     <!--android:icon="@drawable/ic_menu_camera"-->
-
-    <item
-        android:id="@+id/nav_board_size"
-        android:title="Board size" />
+    <group android:id="@+id/group2">
+        <item
+            android:id="@+id/nav_board_size"
+            android:title="Board size" />
+    </group>
     <!--android:icon="@drawable/ic_menu_gallery"-->
-    <item
-        android:id="@+id/nav_difficulty"
-        android:title="Difficulty" />
-    <!--android:icon="@drawable/ic_menu_slideshow"-->
-    <item
-        android:id="@+id/nav_sound"
-        android:title="Sound" />
+
+    <group android:id="@+id/group3">
+        <item
+            android:id="@+id/nav_difficulty"
+            android:title="Difficulty" />
+        <!--android:icon="@drawable/ic_menu_slideshow"-->
+    </group>
+
+    <group android:id="@+id/group4">
+        <item
+            android:id="@+id/nav_sound"
+            android:title="Sound" />
+
+    </group>
     <!--android:icon="@drawable/ic_menu_manage"-->
     <!--</group>-->
 

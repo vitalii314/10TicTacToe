@@ -3,10 +3,12 @@
     <string name="title_activity_starting">StartingActivity</string>
     <string name="singlePlayer">Single Player</string>
     <string name="multiPlayer">Multiplayer</string>
+
     <string name="score">Score</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="new_game_dialog" />
 </resources>

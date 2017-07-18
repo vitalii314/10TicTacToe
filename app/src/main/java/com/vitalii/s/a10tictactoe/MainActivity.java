@@ -3,13 +3,13 @@ package com.vitalii.s.a10tictactoe;
 import android.app.Activity;
 import android.net.Uri;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -70,9 +70,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_new_game) {
-            gameView.startNewGameThread();
-            gameView.simplePlayGround.start();
-            gameView.invalidate();
+            FragmentManager manager = getSupportFragmentManager();
+            NewGameFragment newGameFragment = new NewGameFragment();
+            newGameFragment.show(manager, "new game dialog");
+
 
         } else if (id == R.id.nav_board_size) {
             Toast.makeText(this, "PRESSED", Toast.LENGTH_LONG).show();
@@ -94,9 +95,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
-
-
+    public void startNewGame() {
+        gameView.startNewGameThread();
+        gameView.simplePlayGround.start();
+        gameView.invalidate();
+    }
 
 
 //    @Override
