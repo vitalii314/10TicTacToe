@@ -46,6 +46,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:background="@color/colorNavViewBackground"
+        app:itemTextColor="@color/colorNavViewItemText"
+        app:theme="@style/NavigationViewStyle"
         app:menu="@menu/activity_main_drawer" />
     <!--app:headerLayout="@layout/nav_header_main"-->
 
