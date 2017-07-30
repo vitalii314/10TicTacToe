@@ -20,6 +20,7 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import playground.Seed;
 import playground.SimplePlayGround;
 
 import static com.vitalii.s.a10tictactoe.GameViewStatic.*;
@@ -99,6 +100,10 @@ public class MainActivity extends AppCompatActivity
         gameView.startNewGameThread();
         gameView.simplePlayGround.start();
         gameView.invalidate();
+    }
+
+    public void changePlayerSeed(Seed seed) {
+        gameView.playerSeed=seed;
     }
 
 

@@ -77,29 +77,23 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                 return;
             }
 
-            ((Activity) context).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getContext(), "new thread started", Toast.LENGTH_SHORT).show();
-                }
-            });
+//            ((Activity) context).runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(getContext(), "new thread started", Toast.LENGTH_SHORT).show();
+//                }
+//            });
 
 
             for (int i = 0; i < rects.length; i++) {
                 for (int j = 0; j < rects[i].length; j++) {
                     if (rects[i][j].contains((int) touchX, (int) touchY)
                             && !simplePlayGround.isFinished()
-                            && simplePlayGround.getCurrentPlayer() == Seed.CROSS
+                            && simplePlayGround.getCurrentPlayer() == playerSeed
                             && simplePlayGround.getBoard().cells[i][j].content == Seed.EMPTY) {
                         simplePlayGround.doStep(i, j);
-                        ((Activity) context).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(),"MAKING PLAYER MOVE", Toast.LENGTH_SHORT).show();
-                            }
-                        });
                         postInvalidate();
-                        if (simplePlayGround.getBoard().hasWon(Seed.CROSS)) {
+                        if (simplePlayGround.getBoard().hasWon(playerSeed)) {
                             playerWin++;
                             streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                             showWinner();
@@ -120,17 +114,12 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             }
 
 
-            if (!simplePlayGround.isFinished() && simplePlayGround.getCurrentPlayer() == Seed.NOUGHT) {
+            if (!simplePlayGround.isFinished() &&
+                    simplePlayGround.getCurrentPlayer() == (playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT)) {
                 long start = System.nanoTime();
 
                 makeBotMove();
                 if (Thread.currentThread().isInterrupted()) {
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getContext(), "thread interrupted", Toast.LENGTH_SHORT).show();
-                        }
-                    });
                     return;
                 }
 
@@ -143,7 +132,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                     }
                 }
                 postInvalidate();
-                if (simplePlayGround.getBoard().hasWon(Seed.NOUGHT)) {
+                if (simplePlayGround.getBoard().hasWon(playerSeed==Seed.NOUGHT?Seed.CROSS:Seed.NOUGHT)) {
                     compWin++;
                     streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                     showWinner();
@@ -210,8 +199,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     }
 
     public void startNewGameThread() {
-        touchX=0.0f;
-        touchY=0.0f;
+        touchX = 0.0f;
+        touchY = 0.0f;
         if (gameThread.isAlive()) gameThread.interrupt();
         gameThread = new GameThread();
         gameThread.start();
@@ -246,6 +235,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public static int compWin;
     public TextView textView;
     public float fieldLength;
+    Seed playerSeed;
 
 
     public GameViewStatic(Context context) {
@@ -298,10 +288,11 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             playerWin = 0;
             compWin = 0;
         }
+        playerSeed = Seed.CROSS;
         //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
         //bitmap = StartingActivity.getBitmapFromCache("1");
         firstThread = true;
-        Toast.makeText(getContext(), "INIT", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "INIT", Toast.LENGTH_LONG).show();
         gameThread = new GameThread();
         gameThread.start();
 
@@ -346,7 +337,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
 
         if (bitmap != null) {
-            Toast.makeText(getContext(), "OnDraw", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "OnDraw", Toast.LENGTH_SHORT).show();
             textView = (TextView) ((Activity) context).findViewById(R.id.scoreText);
             textView.setText("Srore:" + playerWin + ":" + compWin);
             final float scaleFactorX;
@@ -492,8 +483,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public boolean onTouchEvent(MotionEvent event) {
 
         if (event.getAction() == MotionEvent.ACTION_DOWN &&
-                (firstThread || !gameThread.isAlive()) &&
-                (simplePlayGround.getCurrentPlayer() == Seed.CROSS || simplePlayGround.isFinished())) {
+                //(firstThread ||
+                !gameThread.isAlive() ) {
             if (queue.isEmpty()) queue.add("go");
             flag = false;
             touchX = event.getX();
@@ -541,18 +532,18 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
 
     public void makeBotMove() {
-        if (simplePlayGround.getCurrentPlayer() == Seed.NOUGHT && !simplePlayGround.isFinished()) {
-            String s = new Gson().toJson(this.simplePlayGround);
-            int[] compMove = bot.makeBotMove(Seed.NOUGHT, s, boardSize[3]);
-            int a = compMove[0];
-            int b = compMove[1];
-            if (!Thread.currentThread().isInterrupted()) {
-                System.out.println(" BOT MADE MOVE");
-                State state = simplePlayGround.doStep(a, b);
-            }
-
-
+        // if (simplePlayGround.getCurrentPlayer() == Seed.NOUGHT && !simplePlayGround.isFinished()) {
+        String s = new Gson().toJson(this.simplePlayGround);
+        int[] compMove = bot.makeBotMove(playerSeed==Seed.NOUGHT?Seed.CROSS:Seed.NOUGHT, s, boardSize[3]);
+        int a = compMove[0];
+        int b = compMove[1];
+        if (!Thread.currentThread().isInterrupted()) {
+            System.out.println(" BOT MADE MOVE");
+            State state = simplePlayGround.doStep(a, b);
         }
+
+
+        //}
 
     }
 
@@ -560,6 +551,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     static class SavedState extends BaseSavedState {
         String savedPlayground;
         String savedBot;
+        String savedPlayerSeed;
         int playerWin;
         int compWin;
 
@@ -572,6 +564,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             super(in);
             savedPlayground = in.readString();
             savedBot = in.readString();
+            savedPlayerSeed = in.readString();
             playerWin = in.readInt();
             compWin = in.readInt();
         }
@@ -581,6 +574,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             super.writeToParcel(out, flags);
             out.writeString(savedPlayground);
             out.writeString(savedBot);
+            out.writeString(savedPlayerSeed);
             out.writeInt(playerWin);
             out.writeInt(compWin);
         }
@@ -603,19 +597,19 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         Parcelable superState = super.onSaveInstanceState();
         SavedState ss = new SavedState(superState);
         ss.savedPlayground = new Gson().toJson(simplePlayGround);
+        ss.savedPlayerSeed = new Gson().toJson(playerSeed);
         //ss.savedBot = new Gson().toJson(bot);
         ss.playerWin = this.playerWin;
         ss.compWin = this.compWin;
 
-        Toast.makeText(getContext(), "OnSaveInstanceState", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "OnSaveInstanceState", Toast.LENGTH_LONG).show();
         return ss;
     }
 
     @Override
-    protected void onDetachedFromWindow() {
+    protected void onDetachedFromWindow() {  //activity destroyed
         super.onDetachedFromWindow();
         if (gameThread.isAlive()) gameThread.interrupt();
-        Toast.makeText(getContext(), "ON DETACH", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -625,16 +619,14 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             return;
         }
 
-
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
         simplePlayGround = new Gson().fromJson(ss.savedPlayground, SimplePlayGround.class);
         //bot = new Gson().fromJson(ss.savedBot, Bot.class);
         this.playerWin = ss.playerWin;
         this.compWin = ss.compWin;
-        //gameThread.setDaemon(true);
-        //gameThread.start();
-        Toast.makeText(getContext(), "onRestoreInstanceState", Toast.LENGTH_LONG).show();
+        this.playerSeed = new Gson().fromJson(ss.savedPlayerSeed, Seed.class);
+        //Toast.makeText(getContext(), "onRestoreInstanceState", Toast.LENGTH_LONG).show();
 
 
     }

@@ -11,12 +11,16 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:listDivider">@color/colorNavViewListDivider</item>
     </style>
 
     <style name="NavigationViewStyle">
+        <item name="android:listDivider">@color/colorNavViewListDivider</item>
         <item name="android:textSize">18sp</item> <!-- menu item text size-->
         <item name="android:listPreferredItemHeightSmall">40dp</item><!-- menu item height-->
+    </style>
+
+    <style name="MyAlertDialogStyle" parent="@android:style/Theme.Dialog" >
+        <item name="android:colorBackground">@color/colorNavViewBackground</item>
     </style>
 
 

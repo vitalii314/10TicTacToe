@@ -6,6 +6,7 @@ package playground.Bot5;
 
 import com.google.gson.Gson;
 
+import playground.Playground;
 import playground.Seed;
 import playground.SimplePlayGround;
 
@@ -19,13 +20,14 @@ import java.util.List;
  * Max recommended depth for playground 3x3 with 3 in row to win - 8
  * Max recommended depth for playground 10x10 with 5 in row to win - 3
  */
-public class Bot5 {
+public class Bot5 implements Playable {
     List<int[][]> randomMoveList = new ArrayList<int[][]>();
     private int depth;
     private SimplePlayGround playGround;
     private int[] move = new int[2];
     int[][] tempMoves;
     int count = 0;
+    private boolean mWasMoveMade;
     private boolean mFlag;  // this variables are used to adopt random move selection
     private boolean mWasFinished; //with alpha beta
     // they determine if returning score is "fair"
@@ -87,9 +89,10 @@ public class Bot5 {
             for (int j = 0; j < playGround.getBoard().cells[i].length; j++) {
                 if (Thread.currentThread().isInterrupted()) return score;
                 if (playGround.getBoard().cells[i][j].content == Seed.EMPTY &&
-                        !playGround.isFinished()) { // && isThereEmptyFieldNear(i, j)) {
+                        !playGround.isFinished() && isThereEmptyFieldNear(i, j)) {
                     count++;
                     mFlag = false;
+                    mWasMoveMade = true;
 
                     playGround.setCurrentPlayer(seed);
 
@@ -519,11 +522,24 @@ public class Bot5 {
         depth = depth1;
         tempMoves = new int[depth][2];
         count = 0;
+        mWasMoveMade = false;
         maximinWithAlphaBeta(-1000, 1000, seed);
-        int i = (int) (Math.random() * randomMoveList.size());
-        move[0] = randomMoveList.get(i)[0][0];
-        move[1] = randomMoveList.get(i)[0][1];
-        return move;
+        if (mWasMoveMade) {
+            int i = (int) (Math.random() * randomMoveList.size());
+            move[0] = randomMoveList.get(i)[0][0];
+            move[1] = randomMoveList.get(i)[0][1];
+            return move;
+        } else {      // no moves were made yet, comp playing cross;
+            if (playGround.getBoard().cells.length == 3) {
+                move[0] = 1;
+                move[1] = 1;
+            } else {
+                move[0] = (int) (Math.random() * 4) + 3;
+                move[1] = (int) (Math.random() * 4) + 3;
+            }
+            return move;
+        }
+
 
     }
 

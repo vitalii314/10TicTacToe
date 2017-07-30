@@ -7,7 +7,12 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
+
+import playground.Seed;
 
 /**
  * Created by user on 18.07.2017.
@@ -17,21 +22,24 @@ public class NewGameFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),4);
         builder.setTitle("New game")
                 .setMessage("Start new game?")
                 .setIcon(null)
                 .setPositiveButton("CROSS", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
+                        ((MainActivity)getActivity()).changePlayerSeed(Seed.CROSS);
                         ((MainActivity)getActivity()).startNewGame();
                     }
                 })
                 .setNegativeButton("NOUGHT", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                        Toast.makeText(getActivity(),"You don't want to play",Toast.LENGTH_SHORT).show();
+                        ((MainActivity)getActivity()).changePlayerSeed(Seed.NOUGHT);
+                        ((MainActivity)getActivity()).startNewGame();
+                        //dialogInterface.cancel();
                     }
                 });
 
