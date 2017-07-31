@@ -1,41 +1,35 @@
 package com.vitalii.s.a10tictactoe;
-
+import android.support.v4.app.DialogFragment;
 import android.app.AlertDialog;
 import android.app.Dialog;
-
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 
-
-import playground.Seed;
 
 /**
- * Created by user on 18.07.2017.
+ * Created by user on 31.07.2017.
  */
-public class NewGameFragment extends DialogFragment {
+public class ChangeBoardSizeFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),4);
-        builder.setTitle("New game")
-                .setMessage("Start new game?")
+        builder.setTitle("Board size")
+                .setMessage("Change board size?")
                 .setIcon(null)
-                .setPositiveButton("CROSS", new DialogInterface.OnClickListener() {
+                .setPositiveButton("3 X 3", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
-                        ((MainActivity)getActivity()).changePlayerSeed(Seed.CROSS);
-                        ((MainActivity)getActivity()).startNewGame();
+                        ((MainActivity)getActivity()).changeBoardSize(3);
                     }
                 })
-                .setNegativeButton("NOUGHT", new DialogInterface.OnClickListener() {
+                .setNegativeButton("10 X 10", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        ((MainActivity)getActivity()).changePlayerSeed(Seed.NOUGHT);
-                        ((MainActivity)getActivity()).startNewGame();
+                        ((MainActivity)getActivity()).changeBoardSize(10);
                         //dialogInterface.cancel();
                     }
                 });
@@ -44,3 +38,4 @@ public class NewGameFragment extends DialogFragment {
         return builder.create();
     }
 }
+

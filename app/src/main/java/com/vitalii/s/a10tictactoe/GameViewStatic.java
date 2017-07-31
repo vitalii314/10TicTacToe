@@ -132,7 +132,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                     }
                 }
                 postInvalidate();
-                if (simplePlayGround.getBoard().hasWon(playerSeed==Seed.NOUGHT?Seed.CROSS:Seed.NOUGHT)) {
+                if (simplePlayGround.getBoard().hasWon(playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT)) {
                     compWin++;
                     streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                     showWinner();
@@ -207,11 +207,27 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
     }
 
+    public void changeBoardSize(int i) {
+        if (gameThread.isAlive()) gameThread.interrupt();
+        if (i == 3) {
+            simplePlayGround = new SimplePlayGround(3, 3, 3);
+            rects = new Rect[3][3];
+            depth = 8;
+        } else {
+            simplePlayGround = new SimplePlayGround(10, 10, 5);
+            rects = new Rect[10][10];
+            depth = 3;
+        }
+        simplePlayGround.start();
+        invalidate();
+    }
+
 
     final BlockingQueue<String> queue = new ArrayBlockingQueue<>(1);
     private int[] boardSize = {10, 10, 5, 3}; //playground rows, cols, number to win,depth
+    int depth;
     private Context context;
-    private Rect[][] rects = new Rect[boardSize[0]][boardSize[1]];
+    Rect[][] rects;
     private Paint mPaint;
     private Paint mCirclePaint;
     private Paint mCrossPaint;
@@ -269,6 +285,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     }
 
     public void init() {
+
         mPaint = new Paint();
         mPaint.setColor(Color.BLACK);
         mPaint.setStrokeWidth(10);
@@ -281,8 +298,10 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         mCrossPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStyle(Paint.Style.STROKE);
-        simplePlayGround = new SimplePlayGround(boardSize[0], boardSize[1], boardSize[2]);
+        simplePlayGround = new SimplePlayGround(10, 10, 5);
         simplePlayGround.start();
+        rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
+        depth = (simplePlayGround.getBoard().cells.length == 3 ? 8 : 3);
         bot = new Bot5();
         if (!firstThread) {
             playerWin = 0;
@@ -484,7 +503,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
         if (event.getAction() == MotionEvent.ACTION_DOWN &&
                 //(firstThread ||
-                !gameThread.isAlive() ) {
+                !gameThread.isAlive()) {
             if (queue.isEmpty()) queue.add("go");
             flag = false;
             touchX = event.getX();
@@ -534,7 +553,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public void makeBotMove() {
         // if (simplePlayGround.getCurrentPlayer() == Seed.NOUGHT && !simplePlayGround.isFinished()) {
         String s = new Gson().toJson(this.simplePlayGround);
-        int[] compMove = bot.makeBotMove(playerSeed==Seed.NOUGHT?Seed.CROSS:Seed.NOUGHT, s, boardSize[3]);
+        int[] compMove = bot.makeBotMove(playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT, s, depth);
         int a = compMove[0];
         int b = compMove[1];
         if (!Thread.currentThread().isInterrupted()) {
@@ -627,6 +646,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         this.compWin = ss.compWin;
         this.playerSeed = new Gson().fromJson(ss.savedPlayerSeed, Seed.class);
         //Toast.makeText(getContext(), "onRestoreInstanceState", Toast.LENGTH_LONG).show();
+        this.rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
 
 
     }

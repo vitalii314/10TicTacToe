@@ -1,6 +1,7 @@
 package com.vitalii.s.a10tictactoe;
 
 import android.app.Activity;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -75,10 +76,10 @@ public class MainActivity extends AppCompatActivity
             NewGameFragment newGameFragment = new NewGameFragment();
             newGameFragment.show(manager, "new game dialog");
 
-
         } else if (id == R.id.nav_board_size) {
-            Toast.makeText(this, "PRESSED", Toast.LENGTH_LONG).show();
-
+            FragmentManager manager = getSupportFragmentManager();
+            ChangeBoardSizeFragment changeBoardSizeFragment = new ChangeBoardSizeFragment();
+            changeBoardSizeFragment.show(manager,"change board size dialog");
         } else if (id == R.id.nav_difficulty) {
 
         } else if (id == R.id.nav_sound) {
@@ -100,6 +101,10 @@ public class MainActivity extends AppCompatActivity
         gameView.startNewGameThread();
         gameView.simplePlayGround.start();
         gameView.invalidate();
+    }
+
+    public void changeBoardSize (int i) {
+       gameView.changeBoardSize(i);
     }
 
     public void changePlayerSeed(Seed seed) {
