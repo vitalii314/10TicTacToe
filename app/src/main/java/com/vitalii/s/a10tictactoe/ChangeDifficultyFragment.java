@@ -1,22 +1,21 @@
 package com.vitalii.s.a10tictactoe;
 
 import android.app.Dialog;
+import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.view.ContextThemeWrapper;
-import android.view.LayoutInflater;
 import android.widget.Toast;
 
+import playground.Seed;
 
 /**
- * Created by user on 31.07.2017.
+ * Created by user on 07.08.2017.
  */
-public class ChangeBoardSizeFragment extends DialogFragment {
+public class ChangeDifficultyFragment extends DialogFragment {
 
-    final String[] items = {"3 X 3", "10 X 10"};
+    final String[] items = {"Easy","Hard"};
     int selection;
 
 
@@ -24,10 +23,11 @@ public class ChangeBoardSizeFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        selection=((MainActivity)getContext()).gameView.simplePlayGround.getBoard().cells.length==GameViewStatic.BOARD_SIZE_3?0:1;
+        selection=((MainActivity)getContext()).gameView.difficulty==GameViewStatic.DIFFICULTY_EASY?0:1;
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
-        builder.setTitle("Choose board size");
+        builder.setTitle("Choose difficulty");
 
         //list of items
 
@@ -46,9 +46,16 @@ public class ChangeBoardSizeFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         // positive button logic
                         if (selection == 0) {
-                            ((MainActivity) getContext()).changeBoardSize(GameViewStatic.BOARD_SIZE_3);
+                            ((MainActivity) getContext()).gameView.difficulty=GameViewStatic.DIFFICULTY_EASY;
+                            ((MainActivity) getContext()).startNewGame();
+                            Toast.makeText(getContext(),"Difficulty="+
+                                    ((MainActivity) getContext()).gameView.difficulty,Toast.LENGTH_SHORT).show();
+
                         } else {
-                            ((MainActivity) getContext()).changeBoardSize(GameViewStatic.BOARD_SIZE_10);
+                            ((MainActivity) getContext()).gameView.difficulty=GameViewStatic.DIFFICULTY_HARD;
+                            ((MainActivity) getContext()).startNewGame();
+                            Toast.makeText(getContext(),"Difficulty="+
+                                    ((MainActivity) getContext()).gameView.difficulty,Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -67,4 +74,3 @@ public class ChangeBoardSizeFragment extends DialogFragment {
 
     }
 }
-

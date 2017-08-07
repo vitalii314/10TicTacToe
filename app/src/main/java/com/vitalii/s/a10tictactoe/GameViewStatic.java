@@ -209,7 +209,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
     public void changeBoardSize(int i) {
         if (gameThread.isAlive()) gameThread.interrupt();
-        if (i == 3) {
+        if (i == BOARD_SIZE_3) {
             simplePlayGround = new SimplePlayGround(3, 3, 3);
             rects = new Rect[3][3];
             depth = 8;
@@ -222,6 +222,12 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         invalidate();
     }
 
+
+    private final static int LINE_WIDTH_NORMAL = 10;
+    public final static int BOARD_SIZE_3 = 3;
+    public final static int BOARD_SIZE_10 = 10;
+    public final static int DIFFICULTY_EASY = 0;
+    public final static int DIFFICULTY_HARD = 1;
 
     final BlockingQueue<String> queue = new ArrayBlockingQueue<>(1);
     private int[] boardSize = {10, 10, 5, 3}; //playground rows, cols, number to win,depth
@@ -252,6 +258,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public TextView textView;
     public float fieldLength;
     Seed playerSeed;
+    int difficulty;
+    boolean isSound;
 
 
     public GameViewStatic(Context context) {
@@ -288,13 +296,13 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
         mPaint = new Paint();
         mPaint.setColor(Color.BLACK);
-        mPaint.setStrokeWidth(10);
+        mPaint.setStrokeWidth(LINE_WIDTH_NORMAL);
         mCirclePaint = new Paint();
         mCirclePaint.setColor(Color.RED);
-        mCirclePaint.setStrokeWidth(10);
+        mCirclePaint.setStrokeWidth(LINE_WIDTH_NORMAL);
         mCrossPaint = new Paint();
         mCrossPaint.setColor(Color.BLUE);
-        mCrossPaint.setStrokeWidth(10);
+        mCrossPaint.setStrokeWidth(LINE_WIDTH_NORMAL);
         mCrossPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStyle(Paint.Style.STROKE);
@@ -308,6 +316,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             compWin = 0;
         }
         playerSeed = Seed.CROSS;
+        difficulty = DIFFICULTY_EASY;
+        isSound = true;
         //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
         //bitmap = StartingActivity.getBitmapFromCache("1");
         firstThread = true;
@@ -376,10 +386,14 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             canvas.drawBitmap(bitmap, 0, 0, null);
             canvas.restoreToCount(savedState);
 
+            mPaint.setStrokeWidth(simplePlayGround.getBoard().cells.length==3?LINE_WIDTH_NORMAL:LINE_WIDTH_NORMAL/2);
+            mCirclePaint.setStrokeWidth(simplePlayGround.getBoard().cells.length==3?LINE_WIDTH_NORMAL:LINE_WIDTH_NORMAL/2);
+            mCrossPaint.setStrokeWidth(simplePlayGround.getBoard().cells.length==3?LINE_WIDTH_NORMAL:LINE_WIDTH_NORMAL/2);
 
             int orient = getContext().getResources().getConfiguration().orientation;
             if (orient == 1) {
                 fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getWidth() - 10) : (getWidth() / 2));
+
             } else {
                 fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getHeight() - 10) : getHeight() / 2);
 

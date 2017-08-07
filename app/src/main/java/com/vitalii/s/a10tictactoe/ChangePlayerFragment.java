@@ -10,24 +10,25 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.widget.Toast;
 
+import playground.Seed;
 
 /**
- * Created by user on 31.07.2017.
+ * Created by user on 07.08.2017.
  */
-public class ChangeBoardSizeFragment extends DialogFragment {
+public class ChangePlayerFragment extends DialogFragment {
 
-    final String[] items = {"3 X 3", "10 X 10"};
+    final String[] items = {"Cross","Nought"};
     int selection;
-
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        selection=((MainActivity)getContext()).gameView.simplePlayGround.getBoard().cells.length==GameViewStatic.BOARD_SIZE_3?0:1;
+        selection=((MainActivity)getContext()).gameView.playerSeed==Seed.CROSS?0:1;
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
-        builder.setTitle("Choose board size");
+        builder.setTitle("Choose side");
 
         //list of items
 
@@ -46,9 +47,12 @@ public class ChangeBoardSizeFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         // positive button logic
                         if (selection == 0) {
-                            ((MainActivity) getContext()).changeBoardSize(GameViewStatic.BOARD_SIZE_3);
+                            ((MainActivity) getContext()).changePlayerSeed(Seed.CROSS);
+                            ((MainActivity) getContext()).startNewGame();
+
                         } else {
-                            ((MainActivity) getContext()).changeBoardSize(GameViewStatic.BOARD_SIZE_10);
+                            ((MainActivity) getContext()).changePlayerSeed(Seed.NOUGHT);
+                            ((MainActivity) getContext()).startNewGame();
                         }
                     }
                 });

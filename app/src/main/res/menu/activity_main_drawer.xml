@@ -17,6 +17,12 @@
     </group>
     <!--android:icon="@drawable/ic_menu_gallery"-->
 
+    <group android:id="@+id/group22">
+        <item
+            android:id="@+id/nav_player"
+            android:title="Choose side" />
+    </group>
+
     <group android:id="@+id/group3">
         <item
             android:id="@+id/nav_difficulty"

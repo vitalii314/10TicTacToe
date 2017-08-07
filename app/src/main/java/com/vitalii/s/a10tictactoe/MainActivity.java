@@ -1,8 +1,6 @@
 package com.vitalii.s.a10tictactoe;
 
-import android.app.Activity;
-import android.graphics.Rect;
-import android.net.Uri;
+
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -12,24 +10,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import playground.Seed;
-import playground.SimplePlayGround;
 
-import static com.vitalii.s.a10tictactoe.GameViewStatic.*;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private GameViewStatic gameView;
+    public GameViewStatic gameView;
     public TextView scoreText;
 
 
@@ -74,15 +64,31 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_new_game) {
             FragmentManager manager = getSupportFragmentManager();
             NewGameFragment newGameFragment = new NewGameFragment();
-            newGameFragment.show(manager, "new game dialog");
+            newGameFragment.show(manager,"new game dialog");
+
+
 
         } else if (id == R.id.nav_board_size) {
             FragmentManager manager = getSupportFragmentManager();
             ChangeBoardSizeFragment changeBoardSizeFragment = new ChangeBoardSizeFragment();
             changeBoardSizeFragment.show(manager,"change board size dialog");
-        } else if (id == R.id.nav_difficulty) {
+
+
+        }  else if (id==R.id.nav_player) {
+            FragmentManager manager = getSupportFragmentManager();
+            ChangePlayerFragment changePlayerFragment = new ChangePlayerFragment();
+            changePlayerFragment.show(manager,"change player dialog");
+
+        }
+        else if (id == R.id.nav_difficulty) {
+            FragmentManager manager = getSupportFragmentManager();
+            ChangeDifficultyFragment changeDifficultyFragment = new ChangeDifficultyFragment();
+            changeDifficultyFragment.show(manager,"change difficulty fragment");
 
         } else if (id == R.id.nav_sound) {
+            FragmentManager manager = getSupportFragmentManager();
+            ChangeSoundFragment changeSoundFragment = new ChangeSoundFragment();
+            changeSoundFragment.show(manager,"change sound fragment");
 
         }
 

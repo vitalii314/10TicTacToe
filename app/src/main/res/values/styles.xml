@@ -19,8 +19,9 @@
         <item name="android:listPreferredItemHeightSmall">40dp</item><!-- menu item height-->
     </style>
 
-    <style name="MyAlertDialogStyle" parent="@android:style/Theme.Dialog" >
+    <style name="MyAlertDialogStyle" parent="Theme.AppCompat.Dialog.MinWidth" >
         <item name="android:colorBackground">@color/colorNavViewBackground</item>
+        <item name="colorAccent">@color/alertDialogButton</item>
     </style>
 
 

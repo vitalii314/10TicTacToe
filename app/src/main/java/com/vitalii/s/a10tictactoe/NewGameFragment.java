@@ -1,12 +1,13 @@
 package com.vitalii.s.a10tictactoe;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 
+import android.app.Dialog;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 
 
 import playground.Seed;
@@ -20,23 +21,20 @@ public class NewGameFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),4);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),R.style.MyAlertDialogStyle);
         builder.setTitle("New game")
                 .setMessage("Start new game?")
                 .setIcon(null)
-                .setPositiveButton("CROSS", new DialogInterface.OnClickListener() {
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
-                        ((MainActivity)getActivity()).changePlayerSeed(Seed.CROSS);
                         ((MainActivity)getActivity()).startNewGame();
                     }
                 })
-                .setNegativeButton("NOUGHT", new DialogInterface.OnClickListener() {
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        ((MainActivity)getActivity()).changePlayerSeed(Seed.NOUGHT);
-                        ((MainActivity)getActivity()).startNewGame();
-                        //dialogInterface.cancel();
+                        dialogInterface.cancel();
                     }
                 });
 

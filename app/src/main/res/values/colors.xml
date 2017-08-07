@@ -6,5 +6,6 @@
     <color name="colorNavViewBackground">#302d2f</color>
     <color name="colorNavViewListDivider">#6b6669</color>
     <color name="colorNavViewItemText">#d2cbcf</color>
+    <color name="alertDialogButton">#00b0ff</color>
 
 </resources>
