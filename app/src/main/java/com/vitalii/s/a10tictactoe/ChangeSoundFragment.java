@@ -43,12 +43,12 @@ public class ChangeSoundFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         // positive button logic
                         if (selection == 0) {
-                            ((MainActivity) getContext()).gameView.isSound = true;
+                            ((MainActivity) getContext()).changeIsSound(true);
                             Toast.makeText(getContext(), "Sound=" +
                                     ((MainActivity) getContext()).gameView.isSound, Toast.LENGTH_SHORT).show();
 
                         } else {
-                            ((MainActivity) getContext()).gameView.isSound = false;
+                            ((MainActivity) getContext()).changeIsSound(false);
                             Toast.makeText(getContext(), "Sound=" +
                                     ((MainActivity) getContext()).gameView.isSound, Toast.LENGTH_SHORT).show();
                         }

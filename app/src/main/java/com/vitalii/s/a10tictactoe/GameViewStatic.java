@@ -198,30 +198,6 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
     }
 
-    public void startNewGameThread() {
-        touchX = 0.0f;
-        touchY = 0.0f;
-        if (gameThread.isAlive()) gameThread.interrupt();
-        gameThread = new GameThread();
-        gameThread.start();
-
-    }
-
-    public void changeBoardSize(int i) {
-        if (gameThread.isAlive()) gameThread.interrupt();
-        if (i == BOARD_SIZE_3) {
-            simplePlayGround = new SimplePlayGround(3, 3, 3);
-            rects = new Rect[3][3];
-            depth = 8;
-        } else {
-            simplePlayGround = new SimplePlayGround(10, 10, 5);
-            rects = new Rect[10][10];
-            depth = 3;
-        }
-        simplePlayGround.start();
-        invalidate();
-    }
-
 
     private final static int LINE_WIDTH_NORMAL = 10;
     public final static int BOARD_SIZE_3 = 3;
@@ -229,11 +205,17 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public final static int DIFFICULTY_EASY = 0;
     public final static int DIFFICULTY_HARD = 1;
 
+    private final static String SAVED_BOARD_SIZE = "saved board size";
+    private final static String SAVED_DIFFICULTY = "saved difficulty";
+    private final static String SAVED_PLAYER_SEED = "saved player seed";
+    private final static String SAVED_IS_SOUND = "saved is sound";
+
+
     final BlockingQueue<String> queue = new ArrayBlockingQueue<>(1);
-    private int[] boardSize = {10, 10, 5, 3}; //playground rows, cols, number to win,depth
+   // private int[] boardSize = {10, 10, 5, 3}; //playground rows, cols, number to win,depth
     int depth;
     private Context context;
-    Rect[][] rects;
+    public Rect[][] rects;
     private Paint mPaint;
     private Paint mCirclePaint;
     private Paint mCrossPaint;
@@ -260,6 +242,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     Seed playerSeed;
     int difficulty;
     boolean isSound;
+    int boardSize;
 
 
     public GameViewStatic(Context context) {
@@ -306,7 +289,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         mCrossPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStyle(Paint.Style.STROKE);
-        simplePlayGround = new SimplePlayGround(10, 10, 5);
+        boardSize = MyApplication.preferences.getInt(SAVED_BOARD_SIZE,BOARD_SIZE_3);
+        simplePlayGround = new SimplePlayGround(boardSize, boardSize,boardSize==BOARD_SIZE_10?5:3);
         simplePlayGround.start();
         rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
         depth = (simplePlayGround.getBoard().cells.length == 3 ? 8 : 3);
@@ -315,11 +299,14 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             playerWin = 0;
             compWin = 0;
         }
-        playerSeed = Seed.CROSS;
-        difficulty = DIFFICULTY_EASY;
-        isSound = true;
+        String crossJson = new Gson().toJson(Seed.CROSS);
+        String s = MyApplication.preferences.getString(SAVED_PLAYER_SEED,crossJson);
+        playerSeed = new Gson().fromJson(s,Seed.class);
+        difficulty = MyApplication.preferences.getInt(SAVED_DIFFICULTY,DIFFICULTY_EASY);
+        isSound = MyApplication.preferences.getBoolean(SAVED_IS_SOUND,true);
         //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
         //bitmap = StartingActivity.getBitmapFromCache("1");
+
         firstThread = true;
         //Toast.makeText(getContext(), "INIT", Toast.LENGTH_LONG).show();
         gameThread = new GameThread();
@@ -587,6 +574,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         String savedPlayerSeed;
         int playerWin;
         int compWin;
+        int savedBoardSize;
+        int savedDifficulty;
 
 
         SavedState(Parcelable superState) {
@@ -600,6 +589,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             savedPlayerSeed = in.readString();
             playerWin = in.readInt();
             compWin = in.readInt();
+            savedBoardSize = in.readInt();
+            savedDifficulty = in.readInt();
         }
 
         @Override
@@ -610,6 +601,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             out.writeString(savedPlayerSeed);
             out.writeInt(playerWin);
             out.writeInt(compWin);
+            out.writeInt(savedBoardSize);
+            out.writeInt(savedDifficulty);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
@@ -634,6 +627,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         //ss.savedBot = new Gson().toJson(bot);
         ss.playerWin = this.playerWin;
         ss.compWin = this.compWin;
+        ss.savedDifficulty = this.difficulty;
+        ss.savedBoardSize = this.boardSize;
+
 
         //Toast.makeText(getContext(), "OnSaveInstanceState", Toast.LENGTH_LONG).show();
         return ss;
@@ -643,6 +639,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     protected void onDetachedFromWindow() {  //activity destroyed
         super.onDetachedFromWindow();
         if (gameThread.isAlive()) gameThread.interrupt();
+
     }
 
     @Override
@@ -655,14 +652,62 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
         simplePlayGround = new Gson().fromJson(ss.savedPlayground, SimplePlayGround.class);
+        boardSize = simplePlayGround.getBoard().cells.length;
         //bot = new Gson().fromJson(ss.savedBot, Bot.class);
         this.playerWin = ss.playerWin;
         this.compWin = ss.compWin;
         this.playerSeed = new Gson().fromJson(ss.savedPlayerSeed, Seed.class);
         //Toast.makeText(getContext(), "onRestoreInstanceState", Toast.LENGTH_LONG).show();
         this.rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
+        this.boardSize = ss.savedBoardSize;
+        this.difficulty = ss.savedDifficulty;
 
 
+    }
+
+    public void startNewGameThread() {
+        touchX = 0.0f;
+        touchY = 0.0f;
+        if (gameThread.isAlive()) gameThread.interrupt();
+        gameThread = new GameThread();
+        gameThread.start();
+
+    }
+
+    public void changeBoardSize(int i) {
+        if (gameThread.isAlive()) gameThread.interrupt();
+        if (i == BOARD_SIZE_3) {
+            simplePlayGround = new SimplePlayGround(3, 3, 3);
+            boardSize=3;
+            rects = new Rect[3][3];
+            depth = 8;
+        } else {
+            simplePlayGround = new SimplePlayGround(10, 10, 5);
+            boardSize = 10;
+            rects = new Rect[10][10];
+            depth = 3;
+        }
+        MyApplication.preferences.edit().putInt(SAVED_BOARD_SIZE,boardSize).commit();
+        simplePlayGround.start();
+        invalidate();
+    }
+
+    public void changePlayerSeed(Seed seed) {
+        playerSeed = seed;
+        MyApplication.preferences.edit().putString(SAVED_PLAYER_SEED,
+                new Gson().toJson(playerSeed)).commit();
+
+    }
+
+    public void changeDifficulty (int diff) {
+        difficulty = diff;
+        MyApplication.preferences.edit().putInt(SAVED_DIFFICULTY,difficulty).commit();
+
+    }
+
+    public void changeIsSound(boolean sound) {
+        isSound = sound;
+        MyApplication.preferences.edit().putBoolean(SAVED_IS_SOUND,isSound).commit();
     }
 
 

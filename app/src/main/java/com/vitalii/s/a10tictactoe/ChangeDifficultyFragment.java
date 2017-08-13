@@ -46,13 +46,13 @@ public class ChangeDifficultyFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         // positive button logic
                         if (selection == 0) {
-                            ((MainActivity) getContext()).gameView.difficulty=GameViewStatic.DIFFICULTY_EASY;
+                            ((MainActivity) getContext()).changeDifficulty(GameViewStatic.DIFFICULTY_EASY);
                             ((MainActivity) getContext()).startNewGame();
                             Toast.makeText(getContext(),"Difficulty="+
                                     ((MainActivity) getContext()).gameView.difficulty,Toast.LENGTH_SHORT).show();
 
                         } else {
-                            ((MainActivity) getContext()).gameView.difficulty=GameViewStatic.DIFFICULTY_HARD;
+                            ((MainActivity) getContext()).changeDifficulty(GameViewStatic.DIFFICULTY_HARD);
                             ((MainActivity) getContext()).startNewGame();
                             Toast.makeText(getContext(),"Difficulty="+
                                     ((MainActivity) getContext()).gameView.difficulty,Toast.LENGTH_SHORT).show();

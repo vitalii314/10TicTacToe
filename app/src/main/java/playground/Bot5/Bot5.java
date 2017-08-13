@@ -524,6 +524,11 @@ public class Bot5 implements Playable {
         count = 0;
         mWasMoveMade = false;
         maximinWithAlphaBeta(-1000, 1000, seed);
+
+        if (Thread.currentThread().isInterrupted()) {
+            int[] arr = {0, 0};
+            return arr;
+        }
         if (mWasMoveMade) {
             int i = (int) (Math.random() * randomMoveList.size());
             move[0] = randomMoveList.get(i)[0][0];

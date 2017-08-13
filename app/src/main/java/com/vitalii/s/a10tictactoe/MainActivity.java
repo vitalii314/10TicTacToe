@@ -1,6 +1,8 @@
 package com.vitalii.s.a10tictactoe;
 
 
+import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -11,25 +13,31 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import playground.Seed;
+import playground.SimplePlayGround;
 
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    //private static final String SAVED_BOARD_SIZE = "saved board size";
     public GameViewStatic gameView;
     public TextView scoreText;
+    public SharedPreferences mPref;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //mPref = getPreferences(MODE_PRIVATE);
         //gameView.setId(R.id.viewStatic);
         // setContentView(gameView); //- если только gameView - без кнопок и др элементов
         setContentView(R.layout.activity_main);
         gameView = (GameViewStatic) findViewById(R.id.viewStatic);
+        //loadSavedPreferences();
         scoreText = (TextView) findViewById(R.id.scoreText);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -42,6 +50,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        //Toast.makeText(this,"SHaredPreferences"+mPref.getInt(SAVED_BOARD_SIZE,100),Toast.LENGTH_SHORT).show();
 
     }
 
@@ -114,15 +123,38 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void changePlayerSeed(Seed seed) {
-        gameView.playerSeed=seed;
+        gameView.changePlayerSeed(seed);
+    }
+
+    public  void changeDifficulty(int diff) {
+        gameView.changeDifficulty(diff);
+
+    }
+
+    public void changeIsSound (boolean isSound) {
+        gameView.changeIsSound(isSound);
     }
 
 
 //    @Override
 //    protected void onSaveInstanceState(Bundle outState) {
+//
+//        SharedPreferences.Editor ed = mPref.edit();
+//        ed.putInt(SAVED_BOARD_SIZE,gameView.boardSize);
+//        ed.commit();
+//        Toast.makeText(this,"SharedPref saved", Toast.LENGTH_LONG).show();
 //        super.onSaveInstanceState(outState);
 //    }
-//
+
+//    public void loadSavedPreferences() {
+//        gameView.boardSize = mPref.getInt(SAVED_BOARD_SIZE,GameViewStatic.BOARD_SIZE_10);
+//        gameView.simplePlayGround = new SimplePlayGround(gameView.boardSize,gameView.boardSize,
+//                gameView.boardSize==10?5:3);
+//        gameView.simplePlayGround.start();
+//        gameView.rects=new Rect[gameView.simplePlayGround.getBoard().cells.length]
+//                [gameView.simplePlayGround.getBoard().cells[0].length];
+//    }
+
 //    @Override
 //    protected void onRestoreInstanceState(Bundle savedInstanceState) {
 //        super.onRestoreInstanceState(savedInstanceState);
