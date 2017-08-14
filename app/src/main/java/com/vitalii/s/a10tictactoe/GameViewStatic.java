@@ -212,7 +212,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
 
     final BlockingQueue<String> queue = new ArrayBlockingQueue<>(1);
-   // private int[] boardSize = {10, 10, 5, 3}; //playground rows, cols, number to win,depth
+    // private int[] boardSize = {10, 10, 5, 3}; //playground rows, cols, number to win,depth
     int depth;
     private Context context;
     public Rect[][] rects;
@@ -289,21 +289,32 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         mCrossPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStyle(Paint.Style.STROKE);
-        boardSize = MyApplication.preferences.getInt(SAVED_BOARD_SIZE,BOARD_SIZE_3);
-        simplePlayGround = new SimplePlayGround(boardSize, boardSize,boardSize==BOARD_SIZE_10?5:3);
-        simplePlayGround.start();
-        rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
-        depth = (simplePlayGround.getBoard().cells.length == 3 ? 8 : 3);
+
         bot = new Bot5();
         if (!firstThread) {
             playerWin = 0;
             compWin = 0;
         }
-        String crossJson = new Gson().toJson(Seed.CROSS);
-        String s = MyApplication.preferences.getString(SAVED_PLAYER_SEED,crossJson);
-        playerSeed = new Gson().fromJson(s,Seed.class);
-        difficulty = MyApplication.preferences.getInt(SAVED_DIFFICULTY,DIFFICULTY_EASY);
-        isSound = MyApplication.preferences.getBoolean(SAVED_IS_SOUND,true);
+
+        if (MyApplication.isNormalRun) {
+            boardSize = MyApplication.preferences.getInt(SAVED_BOARD_SIZE, BOARD_SIZE_3);
+            String crossJson = new Gson().toJson(Seed.CROSS);
+            String s = MyApplication.preferences.getString(SAVED_PLAYER_SEED, crossJson);
+            playerSeed = new Gson().fromJson(s, Seed.class);
+            difficulty = MyApplication.preferences.getInt(SAVED_DIFFICULTY, DIFFICULTY_EASY);
+            isSound = MyApplication.preferences.getBoolean(SAVED_IS_SOUND, true);
+        } else {
+            boardSize = BOARD_SIZE_3;
+            playerSeed = Seed.CROSS;
+            difficulty = DIFFICULTY_EASY;
+            isSound = true;
+
+        }
+        simplePlayGround = new SimplePlayGround(boardSize, boardSize, boardSize == BOARD_SIZE_10 ? 5 : 3);
+        simplePlayGround.start();
+        rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
+        depth = (simplePlayGround.getBoard().cells.length == 3 ? 8 : 3);
+
         //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
         //bitmap = StartingActivity.getBitmapFromCache("1");
 
@@ -354,6 +365,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
         if (bitmap != null) {
             //Toast.makeText(getContext(), "OnDraw", Toast.LENGTH_SHORT).show();
+
             textView = (TextView) ((Activity) context).findViewById(R.id.scoreText);
             textView.setText("Srore:" + playerWin + ":" + compWin);
             final float scaleFactorX;
@@ -373,9 +385,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             canvas.drawBitmap(bitmap, 0, 0, null);
             canvas.restoreToCount(savedState);
 
-            mPaint.setStrokeWidth(simplePlayGround.getBoard().cells.length==3?LINE_WIDTH_NORMAL:LINE_WIDTH_NORMAL/2);
-            mCirclePaint.setStrokeWidth(simplePlayGround.getBoard().cells.length==3?LINE_WIDTH_NORMAL:LINE_WIDTH_NORMAL/2);
-            mCrossPaint.setStrokeWidth(simplePlayGround.getBoard().cells.length==3?LINE_WIDTH_NORMAL:LINE_WIDTH_NORMAL/2);
+            mPaint.setStrokeWidth(simplePlayGround.getBoard().cells.length == 3 ? LINE_WIDTH_NORMAL : LINE_WIDTH_NORMAL / 2);
+            mCirclePaint.setStrokeWidth(simplePlayGround.getBoard().cells.length == 3 ? LINE_WIDTH_NORMAL : LINE_WIDTH_NORMAL / 2);
+            mCrossPaint.setStrokeWidth(simplePlayGround.getBoard().cells.length == 3 ? LINE_WIDTH_NORMAL : LINE_WIDTH_NORMAL / 2);
 
             int orient = getContext().getResources().getConfiguration().orientation;
             if (orient == 1) {
@@ -678,7 +690,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         if (gameThread.isAlive()) gameThread.interrupt();
         if (i == BOARD_SIZE_3) {
             simplePlayGround = new SimplePlayGround(3, 3, 3);
-            boardSize=3;
+            boardSize = 3;
             rects = new Rect[3][3];
             depth = 8;
         } else {
@@ -687,7 +699,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             rects = new Rect[10][10];
             depth = 3;
         }
-        MyApplication.preferences.edit().putInt(SAVED_BOARD_SIZE,boardSize).commit();
+        MyApplication.preferences.edit().putInt(SAVED_BOARD_SIZE, boardSize).commit();
         simplePlayGround.start();
         invalidate();
     }
@@ -699,15 +711,15 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
     }
 
-    public void changeDifficulty (int diff) {
+    public void changeDifficulty(int diff) {
         difficulty = diff;
-        MyApplication.preferences.edit().putInt(SAVED_DIFFICULTY,difficulty).commit();
+        MyApplication.preferences.edit().putInt(SAVED_DIFFICULTY, difficulty).commit();
 
     }
 
     public void changeIsSound(boolean sound) {
         isSound = sound;
-        MyApplication.preferences.edit().putBoolean(SAVED_IS_SOUND,isSound).commit();
+        MyApplication.preferences.edit().putBoolean(SAVED_IS_SOUND, isSound).commit();
     }
 
 
