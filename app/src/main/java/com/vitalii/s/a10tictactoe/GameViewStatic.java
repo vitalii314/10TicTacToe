@@ -175,6 +175,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                             cells[tempArr[0][0]][tempArr[0][1]].content = Seed.EMPTY;
 
                 }
+
+                if (Thread.currentThread().isInterrupted()) return;
 //
                 postInvalidate();
                 try {
@@ -634,7 +636,10 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
         SavedState ss = new SavedState(superState);
-        ss.savedPlayground = new Gson().toJson(simplePlayGround);
+        if (!simplePlayGround.isFinished()) {
+            ss.savedPlayground = new Gson().toJson(simplePlayGround);
+        }
+
         ss.savedPlayerSeed = new Gson().toJson(playerSeed);
         //ss.savedBot = new Gson().toJson(bot);
         ss.playerWin = this.playerWin;
@@ -663,7 +668,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
-        simplePlayGround = new Gson().fromJson(ss.savedPlayground, SimplePlayGround.class);
+        if (ss.savedPlayground != null) {
+            simplePlayGround = new Gson().fromJson(ss.savedPlayground, SimplePlayGround.class);
+        }
         boardSize = simplePlayGround.getBoard().cells.length;
         //bot = new Gson().fromJson(ss.savedBot, Bot.class);
         this.playerWin = ss.playerWin;
@@ -681,6 +688,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         touchX = 0.0f;
         touchY = 0.0f;
         if (gameThread.isAlive()) gameThread.interrupt();
+
+        simplePlayGround.start();
+        invalidate();
         gameThread = new GameThread();
         gameThread.start();
 

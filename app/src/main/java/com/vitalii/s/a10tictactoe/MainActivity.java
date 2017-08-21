@@ -73,31 +73,29 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_new_game) {
             FragmentManager manager = getSupportFragmentManager();
             NewGameFragment newGameFragment = new NewGameFragment();
-            newGameFragment.show(manager,"new game dialog");
-
+            newGameFragment.show(manager, "new game dialog");
 
 
         } else if (id == R.id.nav_board_size) {
             FragmentManager manager = getSupportFragmentManager();
             ChangeBoardSizeFragment changeBoardSizeFragment = new ChangeBoardSizeFragment();
-            changeBoardSizeFragment.show(manager,"change board size dialog");
+            changeBoardSizeFragment.show(manager, "change board size dialog");
 
 
-        }  else if (id==R.id.nav_player) {
+        } else if (id == R.id.nav_player) {
             FragmentManager manager = getSupportFragmentManager();
             ChangePlayerFragment changePlayerFragment = new ChangePlayerFragment();
-            changePlayerFragment.show(manager,"change player dialog");
+            changePlayerFragment.show(manager, "change player dialog");
 
-        }
-        else if (id == R.id.nav_difficulty) {
+        } else if (id == R.id.nav_difficulty) {
             FragmentManager manager = getSupportFragmentManager();
             ChangeDifficultyFragment changeDifficultyFragment = new ChangeDifficultyFragment();
-            changeDifficultyFragment.show(manager,"change difficulty fragment");
+            changeDifficultyFragment.show(manager, "change difficulty fragment");
 
         } else if (id == R.id.nav_sound) {
             FragmentManager manager = getSupportFragmentManager();
             ChangeSoundFragment changeSoundFragment = new ChangeSoundFragment();
-            changeSoundFragment.show(manager,"change sound fragment");
+            changeSoundFragment.show(manager, "change sound fragment");
 
         }
 
@@ -114,24 +112,21 @@ public class MainActivity extends AppCompatActivity
 
     public void startNewGame() {
         gameView.startNewGameThread();
-        gameView.simplePlayGround.start();
-        gameView.invalidate();
     }
 
-    public void changeBoardSize (int i) {
-       gameView.changeBoardSize(i);
+    public void changeBoardSize(int i) {
+        gameView.changeBoardSize(i);
     }
 
     public void changePlayerSeed(Seed seed) {
         gameView.changePlayerSeed(seed);
     }
 
-    public  void changeDifficulty(int diff) {
+    public void changeDifficulty(int diff) {
         gameView.changeDifficulty(diff);
-
     }
 
-    public void changeIsSound (boolean isSound) {
+    public void changeIsSound(boolean isSound) {
         gameView.changeIsSound(isSound);
     }
 
