@@ -7,5 +7,6 @@
     <color name="colorNavViewListDivider">#6b6669</color>
     <color name="colorNavViewItemText">#d2cbcf</color>
     <color name="alertDialogButton">#00b0ff</color>
+    <color name="toolBarTextColor">#ffffff</color>
 
 </resources>

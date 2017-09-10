@@ -69,12 +69,13 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         @Override
         public void run() {
 
-
-            try {
-                String value = queue.take();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
+            if (rects[0][0] == null) {
+                try {
+                    String value = queue.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return;
+                }
             }
 
 //            ((Activity) context).runOnUiThread(new Runnable() {
@@ -92,11 +93,23 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                             && simplePlayGround.getCurrentPlayer() == playerSeed
                             && simplePlayGround.getBoard().cells[i][j].content == Seed.EMPTY) {
                         simplePlayGround.doStep(i, j);
+                        countMove++;
+                        ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
+                                Integer.toString(countMove));
                         postInvalidate();
+
                         if (simplePlayGround.getBoard().hasWon(playerSeed)) {
                             playerWin++;
                             streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
+                            if (bestScore == 0) {
+                                bestScore = countMove;
+                            } else if (countMove > bestScore) {
+                                bestScore = countMove;
+                            }
                             showWinner();
+                            ((MainActivity)getContext()).showBestScoreFragment();
+                            ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
+                                    Integer.toString(countMove));
                             mSoundPool.stop(streamId);
 
                         } else {
@@ -133,7 +146,6 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                 }
                 postInvalidate();
                 if (simplePlayGround.getBoard().hasWon(playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT)) {
-                    compWin++;
                     streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                     showWinner();
                     mSoundPool.stop(streamId);
@@ -144,6 +156,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
             if (simplePlayGround.isFinished() && !flag) {
                 simplePlayGround.start();
+                countMove = 0;
+                ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
+                        Integer.toString(countMove));
                 //bot.start();
                 postInvalidate();
 
@@ -207,7 +222,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public final static int DIFFICULTY_EASY = 0;
     public final static int DIFFICULTY_HARD = 1;
 
-    private final static String SAVED_BOARD_SIZE = "saved board size";
+    public final static String SAVED_BOARD_SIZE = "saved board size";
     private final static String SAVED_DIFFICULTY = "saved difficulty";
     private final static String SAVED_PLAYER_SEED = "saved player seed";
     private final static String SAVED_IS_SOUND = "saved is sound";
@@ -245,6 +260,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     int difficulty;
     boolean isSound;
     int boardSize;
+    int countMove;
+    int bestScore;
 
 
     public GameViewStatic(Context context) {
@@ -279,6 +296,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
     public void init() {
 
+        //((MainActivity)getContext()).findViewById(R.id.toolbarTextView).setVisibility(VISIBLE);
         mPaint = new Paint();
         mPaint.setColor(Color.BLACK);
         mPaint.setStrokeWidth(LINE_WIDTH_NORMAL);
@@ -316,6 +334,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         simplePlayGround.start();
         rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
         depth = (simplePlayGround.getBoard().cells.length == 3 ? 8 : 3);
+        countMove = 0;
+        bestScore = 0;
 
         //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
         //bitmap = StartingActivity.getBitmapFromCache("1");
@@ -368,8 +388,6 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         if (bitmap != null) {
             //Toast.makeText(getContext(), "OnDraw", Toast.LENGTH_SHORT).show();
 
-            textView = (TextView) ((Activity) context).findViewById(R.id.scoreText);
-            textView.setText("Srore:" + playerWin + ":" + compWin);
             final float scaleFactorX;
             final float scaleFactorY;
             int size = simplePlayGround.getBoard().cells.length;
@@ -519,7 +537,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         if (event.getAction() == MotionEvent.ACTION_DOWN &&
                 //(firstThread ||
                 !gameThread.isAlive()) {
-            if (queue.isEmpty()) queue.add("go");
+            //if (queue.isEmpty()) queue.add("go");
             flag = false;
             touchX = event.getX();
             touchY = event.getY();
@@ -590,6 +608,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         int compWin;
         int savedBoardSize;
         int savedDifficulty;
+        int savedCountMove;
+        int savedBestScore;
 
 
         SavedState(Parcelable superState) {
@@ -605,6 +625,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             compWin = in.readInt();
             savedBoardSize = in.readInt();
             savedDifficulty = in.readInt();
+            savedCountMove = in.readInt();
+            savedBestScore = in.readInt();
         }
 
         @Override
@@ -617,6 +639,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             out.writeInt(compWin);
             out.writeInt(savedBoardSize);
             out.writeInt(savedDifficulty);
+            out.writeInt(savedCountMove);
+            out.writeInt(savedBestScore);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
@@ -646,6 +670,10 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         ss.compWin = this.compWin;
         ss.savedDifficulty = this.difficulty;
         ss.savedBoardSize = this.boardSize;
+        if (!simplePlayGround.isFinished()) {
+            ss.savedCountMove = this.countMove;
+        }
+        ss.savedBestScore = this.bestScore;
 
 
         //Toast.makeText(getContext(), "OnSaveInstanceState", Toast.LENGTH_LONG).show();
@@ -680,15 +708,19 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         this.rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
         this.boardSize = ss.savedBoardSize;
         this.difficulty = ss.savedDifficulty;
-
-
+        this.countMove = ss.savedCountMove;
+        this.bestScore = ss.savedBestScore;
+        ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
+                Integer.toString(countMove));
     }
 
     public void startNewGameThread() {
         touchX = 0.0f;
         touchY = 0.0f;
         if (gameThread.isAlive()) gameThread.interrupt();
-
+        countMove = 0;
+        ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
+                Integer.toString(countMove));
         simplePlayGround.start();
         invalidate();
         gameThread = new GameThread();
@@ -703,15 +735,30 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             boardSize = 3;
             rects = new Rect[3][3];
             depth = 8;
+            countMove = 0;
+            ((MainActivity) getContext()).findViewById(R.id.toolbarTextView).setVisibility(GONE);
         } else {
             simplePlayGround = new SimplePlayGround(10, 10, 5);
             boardSize = 10;
             rects = new Rect[10][10];
             depth = 3;
+            countMove = 0;
+            ((MainActivity) getContext()).findViewById(R.id.toolbarTextView).setVisibility(VISIBLE);
         }
+
+
         MyApplication.preferences.edit().putInt(SAVED_BOARD_SIZE, boardSize).commit();
-        simplePlayGround.start();
-        invalidate();
+        //invalidate();
+        try {
+            String s = queue.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        startNewGameThread();
+//        simplePlayGround.start();
+//        ((MainActivity) getContext()).changeToolBarText(Integer.toString(countMove),
+//                Integer.toString(bestScore));
+
     }
 
     public void changePlayerSeed(Seed seed) {

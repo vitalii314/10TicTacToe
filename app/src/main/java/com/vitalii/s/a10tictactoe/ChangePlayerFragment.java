@@ -28,7 +28,7 @@ public class ChangePlayerFragment extends DialogFragment {
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
-        builder.setTitle("Choose side");
+        builder.setTitle("Choose player");
 
         //list of items
 

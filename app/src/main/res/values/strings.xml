@@ -10,5 +10,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="toolBarText">Best score: %1$s  Move: %2$s %3$s </string>
+    <string name="bestScoreText">Congratulations! \nYou won in %1$s moves! </string>
     <string name="new_game_dialog" />
+
 </resources>
