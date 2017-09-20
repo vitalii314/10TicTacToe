@@ -45,7 +45,7 @@ public class ScoreActivity extends AppCompatActivity {
         // Зададим условие для выборки - список столбцов
         String[] projection = {
                 HoteContract.BestScore._ID,
-                HoteContract.BestScore.COLUMN_NAME,
+               // HoteContract.BestScore.COLUMN_NAME,
                 HoteContract.BestScore.COLUMN_SCORE};
 
         String selection = HoteContract.BestScore._ID+">?";
@@ -54,7 +54,7 @@ public class ScoreActivity extends AppCompatActivity {
 
         // Делаем запрос
         Cursor cursor = db.query(
-                HoteContract.BestScore.TABLE_NAME,   // таблица
+                HoteContract.BestScore.TABLE_NAME_DIFF_EASY_CROSS,   // таблица
                 projection,            // столбцы
                 selection,                  // столбцы для условия WHERE
                 selectionArgs,                  // значения для условия WHERE
@@ -66,12 +66,12 @@ public class ScoreActivity extends AppCompatActivity {
         try {
             mName.setText("Таблица содержит " + cursor.getCount() + " чемпионов.\n\n");
             mName.append(HoteContract.BestScore._ID + " - " +
-                    HoteContract.BestScore.COLUMN_NAME + " - " +
+                   // HoteContract.BestScore.COLUMN_NAME + " - " +
                     HoteContract.BestScore.COLUMN_SCORE  + "\n");
 
             // Узнаем индекс каждого столбца
             int idColumnIndex = cursor.getColumnIndex(HoteContract.BestScore._ID);
-            int nameColumnIndex = cursor.getColumnIndex(HoteContract.BestScore.COLUMN_NAME);
+           // int nameColumnIndex = cursor.getColumnIndex(HoteContract.BestScore.COLUMN_NAME);
             int scoreColumnIndex = cursor.getColumnIndex(HoteContract.BestScore.COLUMN_SCORE);
 
 
@@ -79,12 +79,13 @@ public class ScoreActivity extends AppCompatActivity {
             while (cursor.moveToNext()) {
                 // Используем индекс для получения строки или числа
                 int currentID = cursor.getInt(idColumnIndex);
-                String currentName = cursor.getString(nameColumnIndex);
+                //String currentName = cursor.getString(nameColumnIndex);
                 String currentScore = cursor.getString(scoreColumnIndex);
 
                 // Выводим значения каждого столбца
                 mName.append("\n" + currentID + " - " +
-                        currentName + " - " +
+                        //currentName +
+                        " - " +
                         currentScore );
             }
         } finally {
@@ -101,10 +102,10 @@ public class ScoreActivity extends AppCompatActivity {
         // Создаем объект ContentValues, где имена столбцов ключи,
         // а информация о госте является значениями ключей
         ContentValues values = new ContentValues();
-        values.put(HoteContract.BestScore.COLUMN_NAME, "Vitalik");
+        //values.put(HoteContract.BestScore.COLUMN_NAME, "Vitalik");
         values.put(HoteContract.BestScore.COLUMN_SCORE, 100);
 
-        long newRowId = db.insert(HoteContract.BestScore.TABLE_NAME, null, values);
+        long newRowId = db.insert(HoteContract.BestScore.TABLE_NAME_DIFF_EASY_CROSS, null, values);
     }
 }
 

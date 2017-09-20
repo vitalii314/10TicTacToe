@@ -2,8 +2,11 @@ package com.vitalii.s.a10tictactoe;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -37,6 +40,8 @@ import com.google.gson.Gson;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import com.vitalii.s.a10tictactoe.Data.HoteContract;
+import com.vitalii.s.a10tictactoe.Data.HotelDbHelper;
 
 import org.w3c.dom.Text;
 
@@ -103,11 +108,13 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                             streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                             if (bestScore == 0) {
                                 bestScore = countMove;
+                                saveBestScore(bestScore);
                             } else if (countMove > bestScore) {
                                 bestScore = countMove;
+                                saveBestScore(bestScore);
                             }
                             showWinner();
-                            ((MainActivity)getContext()).showBestScoreFragment();
+                            ((MainActivity) getContext()).showBestScoreFragment();
                             ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
                                     Integer.toString(countMove));
                             mSoundPool.stop(streamId);
@@ -262,6 +269,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     int boardSize;
     int countMove;
     int bestScore;
+    private HotelDbHelper mDbHelper;
 
 
     public GameViewStatic(Context context) {
@@ -335,7 +343,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
         depth = (simplePlayGround.getBoard().cells.length == 3 ? 8 : 3);
         countMove = 0;
-        bestScore = 0;
+        mDbHelper = new HotelDbHelper(getContext());
+        readBestScore();
+
 
         //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
         //bitmap = StartingActivity.getBitmapFromCache("1");
@@ -609,7 +619,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         int savedBoardSize;
         int savedDifficulty;
         int savedCountMove;
-        int savedBestScore;
+        //int savedBestScore;
 
 
         SavedState(Parcelable superState) {
@@ -626,7 +636,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             savedBoardSize = in.readInt();
             savedDifficulty = in.readInt();
             savedCountMove = in.readInt();
-            savedBestScore = in.readInt();
+            //savedBestScore = in.readInt();
         }
 
         @Override
@@ -640,7 +650,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
             out.writeInt(savedBoardSize);
             out.writeInt(savedDifficulty);
             out.writeInt(savedCountMove);
-            out.writeInt(savedBestScore);
+            //out.writeInt(savedBestScore);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
@@ -673,7 +683,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         if (!simplePlayGround.isFinished()) {
             ss.savedCountMove = this.countMove;
         }
-        ss.savedBestScore = this.bestScore;
+        //ss.savedBestScore = this.bestScore;
 
 
         //Toast.makeText(getContext(), "OnSaveInstanceState", Toast.LENGTH_LONG).show();
@@ -709,7 +719,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         this.boardSize = ss.savedBoardSize;
         this.difficulty = ss.savedDifficulty;
         this.countMove = ss.savedCountMove;
-        this.bestScore = ss.savedBestScore;
+        //this.bestScore = ss.savedBestScore;
         ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
                 Integer.toString(countMove));
     }
@@ -777,6 +787,91 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public void changeIsSound(boolean sound) {
         isSound = sound;
         MyApplication.preferences.edit().putBoolean(SAVED_IS_SOUND, isSound).commit();
+    }
+
+    private void insertBestScore(int score, String tableName) {
+        // Gets the database in write mode
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        // Создаем объект ContentValues, где имена столбцов ключи,
+        // а информация о госте является значениями ключей
+        ContentValues values = new ContentValues();
+        values.put(HoteContract.BestScore.COLUMN_SCORE, score);
+
+        long newRowId = db.update(tableName,
+                values, "_id = ?", new String[]{Integer.toString(1)});
+    }
+
+    public int displayDataBaseInfo(String tableName) {
+        // Создадим и откроем для чтения базу данных
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        // Зададим условие для выборки - список столбцов
+        String[] projection = {
+                HoteContract.BestScore._ID,
+                // HoteContract.BestScore.COLUMN_NAME,
+                HoteContract.BestScore.COLUMN_SCORE};
+
+        String selection = HoteContract.BestScore._ID + ">?";
+        String[] selectionArgs = {"0"};
+
+
+        // Делаем запрос
+        Cursor cursor = db.query(
+                tableName,   // таблица
+                projection,            // столбцы
+                selection,                  // столбцы для условия WHERE
+                selectionArgs,                  // значения для условия WHERE
+                null,                  // Don't group the rows
+                null,                  // Don't filter by row groups
+                HoteContract.BestScore.COLUMN_SCORE + " DESC");// порядок сортировки
+
+
+        try {
+
+            // Узнаем индекс каждого столбца
+            int idColumnIndex = cursor.getColumnIndex(HoteContract.BestScore._ID);
+            // int nameColumnIndex = cursor.getColumnIndex(HoteContract.BestScore.COLUMN_NAME);
+            int scoreColumnIndex = cursor.getColumnIndex(HoteContract.BestScore.COLUMN_SCORE);
+
+//            // Проходим через все ряды
+            while (cursor.moveToNext()) {
+                // Используем индекс для получения строки или числа
+                int currentID = cursor.getInt(idColumnIndex);
+                //String currentName = cursor.getString(nameColumnIndex);
+                String currentScore = cursor.getString(scoreColumnIndex);
+                System.out.println("ID=" + currentID + " score=" + currentScore);
+
+                return Integer.parseInt(currentScore);
+            }
+        } finally {
+            // Всегда закрываем курсор после чтения
+            cursor.close();
+        }
+        return 0;
+    }
+
+    public void saveBestScore(int bestScore) {
+        if (playerSeed == Seed.CROSS) {
+            String tableName = difficulty == DIFFICULTY_EASY ? HoteContract.BestScore.TABLE_NAME_DIFF_EASY_CROSS :
+                    HoteContract.BestScore.TABLE_NAME_DIFF_HARD_CROSS;
+            insertBestScore(bestScore, tableName);
+        } else if (playerSeed == Seed.NOUGHT) {
+            String tableName = difficulty == DIFFICULTY_EASY ? HoteContract.BestScore.TABLE_NAME_DIFF_EASY_NOUGHT :
+                    HoteContract.BestScore.TABLE_NAME_DIFF_HARD_NOUGHT;
+            insertBestScore(bestScore, tableName);
+        }
+
+    }
+
+    public void readBestScore() {
+        if (playerSeed == Seed.CROSS) {
+            bestScore = (difficulty == DIFFICULTY_EASY ? displayDataBaseInfo(HoteContract.BestScore.TABLE_NAME_DIFF_EASY_CROSS) :
+                    displayDataBaseInfo(HoteContract.BestScore.TABLE_NAME_DIFF_HARD_CROSS));
+        } else if (playerSeed == Seed.NOUGHT) {
+            bestScore = (difficulty == DIFFICULTY_EASY ? displayDataBaseInfo(HoteContract.BestScore.TABLE_NAME_DIFF_EASY_NOUGHT) :
+                    displayDataBaseInfo(HoteContract.BestScore.TABLE_NAME_DIFF_HARD_NOUGHT));
+        }
+
     }
 
 

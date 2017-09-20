@@ -47,17 +47,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        barText = (TextView) findViewById(R.id.toolbarTextView);
-        String bestScore = Integer.toString(gameView.bestScore);
-        String playerMove = Integer.toBinaryString(gameView.countMove);
-        //barText.setText("Best score: " + bestScore + " " + "Move: " + playerMove);
-        String text;
-        if (!bestScore.equals("0")) {
-            text = getResources().getString(R.string.toolBarText, bestScore, playerMove, " ");
-        } else {
-            text = getResources().getString(R.string.toolBarText, "  ", playerMove, " ");
-        }
-        barText.setText(text);
+        showBestScore();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -137,10 +127,14 @@ public class MainActivity extends AppCompatActivity
 
     public void changePlayerSeed(Seed seed) {
         gameView.changePlayerSeed(seed);
+        gameView.readBestScore();
+        showBestScore();
     }
 
     public void changeDifficulty(int diff) {
         gameView.changeDifficulty(diff);
+        gameView.readBestScore();
+        showBestScore();
     }
 
     public void changeIsSound(boolean isSound) {
@@ -163,13 +157,28 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void showBestScoreFragment(){
+    public void showBestScoreFragment() {
         FragmentManager manager = getSupportFragmentManager();
         BestScoreFragment bestScoreFragment = new BestScoreFragment();
         bestScoreFragment.show(manager, "change player dialog");
 
     }
-//    @Override
+
+    public void showBestScore() {
+        barText = (TextView) findViewById(R.id.toolbarTextView);
+        String bestScore = Integer.toString(gameView.bestScore);
+        String playerMove = Integer.toString(gameView.countMove);
+        //barText.setText("Best score: " + bestScore + " " + "Move: " + playerMove);
+        String text;
+        if (!bestScore.equals("0")) {
+            text = getResources().getString(R.string.toolBarText, bestScore, playerMove, " ");
+        } else {
+            text = getResources().getString(R.string.toolBarText, "  ", playerMove, " ");
+        }
+        barText.setText(text);
+    }
+
+    //    @Override
 //    protected void onSaveInstanceState(Bundle outState) {
 //
 //        SharedPreferences.Editor ed = mPref.edit();
