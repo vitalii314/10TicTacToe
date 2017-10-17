@@ -109,7 +109,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                             if (bestScore == 0) {
                                 bestScore = countMove;
                                 saveBestScore(bestScore);
-                            } else if (countMove > bestScore) {
+                            } else if (countMove < bestScore) {
                                 bestScore = countMove;
                                 saveBestScore(bestScore);
                             }
@@ -596,7 +596,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public void makeBotMove() {
         // if (simplePlayGround.getCurrentPlayer() == Seed.NOUGHT && !simplePlayGround.isFinished()) {
         String s = new Gson().toJson(this.simplePlayGround);
-        int[] compMove = bot.makeBotMove(playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT, s, depth);
+        int[] compMove = bot.makeBotMove(playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT, s, depth, difficulty);
         int a = compMove[0];
         int b = compMove[1];
         if (!Thread.currentThread().isInterrupted()) {
@@ -676,8 +676,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
         ss.savedPlayerSeed = new Gson().toJson(playerSeed);
         //ss.savedBot = new Gson().toJson(bot);
-        ss.playerWin = this.playerWin;
-        ss.compWin = this.compWin;
+        ss.playerWin = playerWin;
+        ss.compWin = compWin;
         ss.savedDifficulty = this.difficulty;
         ss.savedBoardSize = this.boardSize;
         if (!simplePlayGround.isFinished()) {
@@ -711,8 +711,8 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
         }
         boardSize = simplePlayGround.getBoard().cells.length;
         //bot = new Gson().fromJson(ss.savedBot, Bot.class);
-        this.playerWin = ss.playerWin;
-        this.compWin = ss.compWin;
+        playerWin = ss.playerWin;
+        compWin = ss.compWin;
         this.playerSeed = new Gson().fromJson(ss.savedPlayerSeed, Seed.class);
         //Toast.makeText(getContext(), "onRestoreInstanceState", Toast.LENGTH_LONG).show();
         this.rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];

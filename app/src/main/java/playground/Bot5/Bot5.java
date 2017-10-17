@@ -5,6 +5,7 @@ package playground.Bot5;
  */
 
 import com.google.gson.Gson;
+import com.vitalii.s.a10tictactoe.GameViewStatic;
 
 import playground.Playground;
 import playground.Seed;
@@ -22,6 +23,7 @@ import java.util.List;
  */
 public class Bot5 implements Playable {
     List<int[][]> randomMoveList = new ArrayList<int[][]>();
+    private int difficulty;
     private int depth;
     private SimplePlayGround playGround;
     private int[] move = new int[2];
@@ -162,6 +164,7 @@ public class Bot5 implements Playable {
                                 int[][] tempArr = {{move[0], move[1]}};
                                 randomMoveList.add(tempArr);
 
+
                             }
 
                         }
@@ -219,6 +222,7 @@ public class Bot5 implements Playable {
         int countTotalPlayer;
         boolean isWinningNextMovePlayer = false;
         boolean isWinningNextMoveOpp = false;
+        boolean isWinningInTwoMovesOpp = false;
         //horizontal player's
         int count1 = 0;
         while (((j + count1 + 1) < playGround.getBoard().COLS) &&
@@ -253,17 +257,17 @@ public class Bot5 implements Playable {
                 playGround.getBoard().cells[i - count2 - 1][j].content == seed) {
             count2++;
         }
-        if ((count1 + count2) > countTotalPlayer) countTotalPlayer = count1 + count2;
 
         // checking if we have numberToWin-1 in col and
         // 2 empty on both sides (winning next move)
-        if (countTotalPlayer == playGround.getBoard().numberToWin - 2 &&
+        if ((count1 + count2) == playGround.getBoard().numberToWin - 2 &&
                 i + count1 + 1 < playGround.getBoard().ROWS &&
                 playGround.getBoard().cells[i + count1 + 1][j].content == Seed.EMPTY &&
                 i - count2 - 1 >= 0 &&
                 playGround.getBoard().cells[i - count2 - 1][j].content == Seed.EMPTY) {
             isWinningNextMovePlayer = true;
         }
+        if ((count1 + count2) > countTotalPlayer) countTotalPlayer = count1 + count2;
 
         // player's diagonal 1
         count1 = 0;
@@ -277,11 +281,11 @@ public class Bot5 implements Playable {
                 playGround.getBoard().cells[i - count2 - 1][j - count2 - 1].content == seed) {
             count2++;
         }
-        if ((count1 + count2) > countTotalPlayer) countTotalPlayer = count1 + count2;
+
 
         // checking if we have numberToWin-1 in diagonal 1 and
         // 2 empty on both sides (winning next move)
-        if (countTotalPlayer == playGround.getBoard().numberToWin - 2 &&
+        if ((count1 + count2) == playGround.getBoard().numberToWin - 2 &&
                 j + count1 + 1 < playGround.getBoard().COLS &&
                 i + count1 + 1 < playGround.getBoard().ROWS &&
                 playGround.getBoard().cells[i + count1 + 1][j + count1 + 1].content == Seed.EMPTY &&
@@ -289,6 +293,7 @@ public class Bot5 implements Playable {
                 playGround.getBoard().cells[i - count2 - 1][j - count2 - 1].content == Seed.EMPTY) {
             isWinningNextMovePlayer = true;
         }
+        if ((count1 + count2) > countTotalPlayer) countTotalPlayer = count1 + count2;
 
 
         // player's diagonal 2
@@ -302,11 +307,11 @@ public class Bot5 implements Playable {
                 playGround.getBoard().cells[i + count2 + 1][j - count2 - 1].content == seed) {
             count2++;
         }
-        if ((count1 + count2) > countTotalPlayer) countTotalPlayer = count1 + count2;
+
 
         // checking if player has numberToWin-1 in diagonal 2 and
         // 2 empty on both sides (winning next move)
-        if (countTotalPlayer == playGround.getBoard().numberToWin - 2 &&
+        if ((count1 + count2) == playGround.getBoard().numberToWin - 2 &&
                 j + count1 + 1 < playGround.getBoard().COLS &&
                 i - count1 - 1 >= 0 &&
                 playGround.getBoard().cells[i - count1 - 1][j + count1 + 1].content == Seed.EMPTY &&
@@ -315,6 +320,7 @@ public class Bot5 implements Playable {
                 playGround.getBoard().cells[i + count2 + 1][j - count2 - 1].content == Seed.EMPTY) {
             isWinningNextMovePlayer = true;
         }
+        if ((count1 + count2) > countTotalPlayer) countTotalPlayer = count1 + count2;
 
         Seed opponentSeed = seed == Seed.CROSS ? Seed.NOUGHT : Seed.CROSS;
 
@@ -373,12 +379,12 @@ public class Bot5 implements Playable {
         if ((count1 + count2) > countTotalOpp) countTotalOpp = count1 + count2;
 
         //checking if opponent is winning next move
-        // (opp has numberToWin and 2 empty cells on both sides
+        // (opp has numberToWin-1 and 2 empty cells on both sides
         if (count - 2 >= 0) {
             int i1 = tempMoves[count - 2][0]; // prev opponent's
             int j1 = tempMoves[count - 2][1];   //move
 
-            //removing last player's move as we are evaluating previos move board state
+            //removing last player's move as we are evaluating previous move board state
             playGround.getBoard().cells[tempMoves[count - 1][0]][tempMoves[count - 1][1]].content = Seed.EMPTY;
 
             //horizontal opponent's
@@ -394,7 +400,7 @@ public class Bot5 implements Playable {
                 count2++;
             }
             countTotalOppPrevMove = count1 + count2;
-            // checking if opp has numberToWin-2 in row and
+            // checking if opp has numberToWin-1 in row and
             // 2 empty on both sides (winning next move)
             if (countTotalOppPrevMove == playGround.getBoard().numberToWin - 2 &&
                     j1 + count1 + 1 < playGround.getBoard().COLS &&
@@ -418,7 +424,7 @@ public class Bot5 implements Playable {
             }
             countTotalOppPrevMove = count1 + count2;
 
-            // checking if opp has numberToWin-2 in col and
+            // checking if opp has numberToWin-1 in col and
             // 2 empty on both sides (winning next move)
             if (countTotalOppPrevMove == playGround.getBoard().numberToWin - 2 &&
                     i1 + count1 + 1 < playGround.getBoard().ROWS &&
@@ -443,7 +449,7 @@ public class Bot5 implements Playable {
             }
             countTotalOppPrevMove = count1 + count2;
 
-            // checking if opp has numberToWin-2 in diagonal 1 and
+            // checking if opp has numberToWin-1 in diagonal 1 and
             // 2 empty on both sides (winning next move)
             if (countTotalOppPrevMove == playGround.getBoard().numberToWin - 2 &&
                     i1 + count1 + 1 < playGround.getBoard().ROWS &&
@@ -469,7 +475,7 @@ public class Bot5 implements Playable {
             }
             countTotalOppPrevMove = count1 + count2;
 
-            // checking if opp has numberToWin-2 in diagonal 2 and
+            // checking if opp has numberToWin-1 in diagonal 2 and
             // 2 empty on both sides (winning next move)
             if (countTotalOppPrevMove == playGround.getBoard().numberToWin - 2 &&
                     i1 + count1 + 1 < playGround.getBoard().ROWS &&
@@ -482,7 +488,158 @@ public class Bot5 implements Playable {
             }
 
 
+            //checking if opponent is winning in two moves:
+            // has numberToWin - 2 and empty 3 empty fields on both sides in at least 2 directions
+            if (difficulty == GameViewStatic.DIFFICULTY_HARD) {
+
+                int countTotalRow = 0;
+                int countTotalCol = 0;
+                int countTotalDiag1 = 0;
+                int countTotalDiag2 = 0;
+
+                //horizontal opponent's
+                count1 = 0;
+                while (((j1 + count1 + 1) < playGround.getBoard().COLS) &&
+                        playGround.getBoard().cells[i1][j1 + count1 + 1].content == opponentSeed) {
+                    count1++;
+                }
+                count2 = 0;
+                while ((j1 - count2 - 1 >= 0) &&
+                        playGround.getBoard().cells[i1][j1 - count2 - 1].content == opponentSeed) {
+                    count2++;
+                }
+                if (((count1 + count2) >= playGround.getBoard().numberToWin - 3 &&
+                        j1 + count1 + 1 < playGround.getBoard().COLS &&
+                        playGround.getBoard().cells[i1][j1 + count1 + 1].content == Seed.EMPTY &&
+                        j1 - count2 - 1 >= 0 &&
+                        playGround.getBoard().cells[i1][j1 - count2 - 1].content == Seed.EMPTY &&
+                        ((j1 + count1 + 2 < playGround.getBoard().COLS &&
+                                playGround.getBoard().cells[i1][j1 + count1 + 2].content == Seed.EMPTY) ||
+                                (j1 - count2 - 2 >= 0 &&
+                                        playGround.getBoard().cells[i1][j1 - count2 - 2].content == Seed.EMPTY))
+                ) || // or numberToWin-1 in row and one empty field
+                        ((count1 + count2) >= playGround.getBoard().numberToWin - 2 &&
+                                ((j1 + count1 + 1 < playGround.getBoard().COLS &&
+                                        playGround.getBoard().cells[i1][j1 + count1 + 1].content == Seed.EMPTY) ||
+                                        (j1 - count2 - 1 >= 0 &&
+                                                playGround.getBoard().cells[i1][j1 - count2 - 1].content == Seed.EMPTY)))) {
+                    countTotalRow = 1;
+                }
+
+                // vertikal
+                count1 = 0;
+                while (((i1 + count1 + 1) < playGround.getBoard().ROWS) &&
+                        playGround.getBoard().cells[i1 + count1 + 1][j1].content == opponentSeed) {
+                    count1++;
+                }
+                count2 = 0;
+                while ((i1 - count2 - 1 >= 0) &&
+                        playGround.getBoard().cells[i1 - count2 - 1][j1].content == opponentSeed) {
+                    count2++;
+                }
+
+                if ((count1 + count2) >= playGround.getBoard().numberToWin - 3 &&
+                        i1 + count1 + 1 < playGround.getBoard().ROWS &&
+                        playGround.getBoard().cells[i1 + count1 + 1][j1].content == Seed.EMPTY &&
+                        i1 - count2 - 1 >= 0 &&
+                        playGround.getBoard().cells[i1 - count2 - 1][j1].content == Seed.EMPTY &&
+                        ((i1 + count1 + 2 < playGround.getBoard().ROWS &&
+                                playGround.getBoard().cells[i1 + count1 + 2][j1].content == Seed.EMPTY) ||
+                                (i1 - count2 - 2 >= 0 &&
+                                        playGround.getBoard().cells[i1 - count2 - 2][j1].content == Seed.EMPTY)) ||
+                        // or numberToWin-1 in row and one empty field
+                        (((count1 + count2) >= playGround.getBoard().numberToWin - 2) &&
+                                ((i1 + count1 + 1 < playGround.getBoard().ROWS &&
+                                        playGround.getBoard().cells[i1 + count1 + 1][j1].content == Seed.EMPTY) ||
+                                        (i1 - count2 - 1 >= 0 &&
+                                                playGround.getBoard().cells[i1 - count2 - 1][j1].content == Seed.EMPTY)))) {
+                    countTotalCol = 1;
+                }
+
+
+                //diagonal 1
+                count1 = 0;
+                while ((i1 + count1 + 1) < playGround.getBoard().ROWS &&
+                        (j1 + count1 + 1) < playGround.getBoard().COLS &&
+                        playGround.getBoard().cells[i1 + count1 + 1][j1 + count1 + 1].content == opponentSeed) {
+                    count1++;
+                }
+                count2 = 0;
+                while ((i1 - count2 - 1) >= 0 && (j1 - count2 - 1) >= 0 &&
+                        playGround.getBoard().cells[i1 - count2 - 1][j1 - count2 - 1].content == opponentSeed) {
+                    count2++;
+                }
+
+                if ((count1 + count2) >= playGround.getBoard().numberToWin - 3 &&
+                        i1 + count1 + 1 < playGround.getBoard().ROWS &&
+                        j1 + count1 + 1 < playGround.getBoard().COLS &&
+                        playGround.getBoard().cells[i1 + count1 + 1][j1 + count1 + 1].content == Seed.EMPTY &&
+                        j1 - count2 - 1 >= 0 &&
+                        i1 - count2 - 1 >= 0 &&
+                        playGround.getBoard().cells[i1 - count2 - 1][j1 - count2 - 1].content == Seed.EMPTY &&
+                        ((i1 + count1 + 2 < playGround.getBoard().ROWS &&
+                                j1 + count1 + 2 < playGround.getBoard().COLS &&
+                                playGround.getBoard().cells[i1 + count1 + 2][j1 + count1 + 2].content == Seed.EMPTY) ||
+                                (j1 - count2 - 2 >= 0 &&
+                                        i1 - count2 - 2 >= 0 &&
+                                        playGround.getBoard().cells[i1 - count2 - 2][j1 - count2 - 2].content == Seed.EMPTY))
+                        ||// or numberToWin-1 in row and one empty field
+                        ((count1 + count2) >= playGround.getBoard().numberToWin - 2 &&
+                                ((i1 + count1 + 1 < playGround.getBoard().ROWS &&
+                                        j1 + count1 + 1 < playGround.getBoard().COLS &&
+                                        playGround.getBoard().cells[i1 + count1 + 1][j1 + count1 + 1].content == Seed.EMPTY) ||
+                                        (j1 - count2 - 1 >= 0 &&
+                                                i1 - count2 - 1 >= 0 &&
+                                                playGround.getBoard().cells[i1 - count2 - 1][j1 - count2 - 1].content == Seed.EMPTY)))) {
+                    countTotalDiag1 = 1;
+                }
+
+                //diagonal 2
+                count1 = 0;
+                while ((i1 + count1 + 1) < playGround.getBoard().ROWS &&
+                        (j1 - count1 - 1) >= 0 &&
+                        playGround.getBoard().cells[i1 + count1 + 1][j1 - count1 - 1].content == opponentSeed) {
+                    count1++;
+                }
+                count2 = 0;
+                while ((i1 - count2 - 1) >= 0 && (j1 + count2 + 1) < playGround.getBoard().COLS &&
+                        playGround.getBoard().cells[i1 - count2 - 1][j1 + count2 + 1].content == opponentSeed) {
+                    count2++;
+                }
+
+                if ((count1 + count2) >= playGround.getBoard().numberToWin - 3 &&
+                        i1 + count1 + 1 < playGround.getBoard().ROWS &&
+                        j1 - count1 - 1 >= 0 &&
+                        playGround.getBoard().cells[i1 + count1 + 1][j1 - count1 - 1].content == Seed.EMPTY &&
+                        j1 + count2 + 1 < playGround.getBoard().COLS &&
+                        i1 - count2 - 1 >= 0 &&
+                        playGround.getBoard().cells[i1 - count2 - 1][j1 + count2 + 1].content == Seed.EMPTY &&
+                        ((i1 + count1 + 2 < playGround.getBoard().ROWS &&
+                                j1 - count1 - 2 >= 0 &&
+                                playGround.getBoard().cells[i1 + count1 + 2][j1 - count1 - 2].content == Seed.EMPTY) ||
+                                (j1 + count2 + 2 < playGround.getBoard().COLS &&
+                                        i1 - count2 - 2 >= 0 &&
+                                        playGround.getBoard().cells[i1 - count2 - 2][j1 + count2 + 2].content == Seed.EMPTY))
+                        || // or numberToWin-1 in row and one empty field
+                        ((count1 + count2) >= playGround.getBoard().numberToWin - 2 &&
+                                ((i1 + count1 + 1 < playGround.getBoard().ROWS &&
+                                        j1 - count1 - 1 >= 0 &&
+                                        playGround.getBoard().cells[i1 + count1 + 1][j1 - count1 - 1].content == Seed.EMPTY) ||
+                                        (j1 + count2 + 1 < playGround.getBoard().COLS &&
+                                                i1 - count2 - 1 >= 0 &&
+                                                playGround.getBoard().cells[i1 - count2 - 1][j1 + count2 + 1].content == Seed.EMPTY)))) {
+                    countTotalDiag2 = 1;
+                }
+
+                if ((countTotalRow + countTotalCol + countTotalDiag1 + countTotalDiag2) >= 2) {
+                    isWinningInTwoMovesOpp = true;
+                }
+
+
+            }
+
         }
+
 
         Seed tempSeed = (count % 2 != 0 ? seed :
                 (seed == Seed.CROSS ? Seed.NOUGHT : Seed.CROSS));
@@ -493,11 +650,13 @@ public class Bot5 implements Playable {
                 return -800;
             }
             if (isWinningNextMovePlayer) return 800;
+            if (isWinningInTwoMovesOpp) return -700;
             return countTotalPlayer + countTotalOpp;
         } else {
             if (countTotalPlayer >= playGround.getBoard().numberToWin - 1) return -900;
             if (isWinningNextMoveOpp) return 800;
             if (isWinningNextMovePlayer) return -800;
+            if (isWinningInTwoMovesOpp) return 700;
             return -(countTotalPlayer + countTotalOpp);
         }
 
@@ -518,9 +677,10 @@ public class Bot5 implements Playable {
         return false;
     }
 
-    public int[] makeBotMove(Seed seed, String GsonPlayGround, int depth1) {
+    public int[] makeBotMove(Seed seed, String GsonPlayGround, int depth1, int difficulty) {
         playGround = new Gson().fromJson(GsonPlayGround, SimplePlayGround.class);
         depth = depth1;
+        this.difficulty = difficulty;
         tempMoves = new int[depth][2];
         count = 0;
         mWasMoveMade = false;

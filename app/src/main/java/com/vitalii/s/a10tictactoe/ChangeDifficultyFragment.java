@@ -48,14 +48,12 @@ public class ChangeDifficultyFragment extends DialogFragment {
                         if (selection == 0) {
                             ((MainActivity) getContext()).changeDifficulty(GameViewStatic.DIFFICULTY_EASY);
                             ((MainActivity) getContext()).startNewGame();
-                            Toast.makeText(getContext(),"Difficulty="+
-                                    ((MainActivity) getContext()).gameView.difficulty,Toast.LENGTH_SHORT).show();
+
 
                         } else {
                             ((MainActivity) getContext()).changeDifficulty(GameViewStatic.DIFFICULTY_HARD);
                             ((MainActivity) getContext()).startNewGame();
-                            Toast.makeText(getContext(),"Difficulty="+
-                                    ((MainActivity) getContext()).gameView.difficulty,Toast.LENGTH_SHORT).show();
+
                         }
                     }
                 });
