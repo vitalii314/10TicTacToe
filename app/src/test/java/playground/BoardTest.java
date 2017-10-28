@@ -68,6 +68,27 @@ public class BoardTest {
 
     }
 
+
+    @Test
+    public  void testNewDiffTest () {
+        SimplePlayGround simplePlayGround= new SimplePlayGround(10,10,5);
+        simplePlayGround.start();
+        simplePlayGround.getBoard().cells[2][2].content=Seed.CROSS;
+        simplePlayGround.getBoard().cells[2][5].content=Seed.CROSS;
+        simplePlayGround.getBoard().cells[2][6].content=Seed.CROSS;
+        simplePlayGround.getBoard().cells[2][7].content=Seed.CROSS;
+        simplePlayGround.getBoard().cells[3][4].content=Seed.CROSS;
+        simplePlayGround.getBoard().cells[4][5].content=Seed.CROSS;
+
+        simplePlayGround.setCurrentPlayer(Seed.NOUGHT);
+        simplePlayGround.getBoard().paint();
+        Bot5 bot = new Bot5();
+        int[] move = bot.makeBotMove(Seed.NOUGHT,new Gson().toJson(simplePlayGround),3,GameViewStatic.DIFFICULTY_HARD);
+        simplePlayGround.doStep(move[0],move[1]);
+        System.out.println("**********************************");
+        simplePlayGround.getBoard().paint();
+    }
+
     @Test
     public void testHasWonHorizontal() throws Exception {
         Board  board = new Board(10,10,5);

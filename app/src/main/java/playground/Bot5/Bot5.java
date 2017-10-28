@@ -499,135 +499,301 @@ public class Bot5 implements Playable {
 
                 //horizontal opponent's
                 count1 = 0;
-                while (((j1 + count1 + 1) < playGround.getBoard().COLS) &&
-                        playGround.getBoard().cells[i1][j1 + count1 + 1].content == opponentSeed) {
-                    count1++;
+                int dCount1 = 0;
+                int countHelper = 0;
+                boolean isEmptyFieldFound1 = false;
+                while (((j1 + count1 + 1 + dCount1) < playGround.getBoard().COLS) &&
+                        (playGround.getBoard().cells[i1][j1 + count1 + 1 + dCount1].content == opponentSeed ||
+                                (playGround.getBoard().cells[i1][j1 + count1 + 1 + dCount1].content == Seed.EMPTY && !isEmptyFieldFound1))) {
+                    if (playGround.getBoard().cells[i1][j1 + count1 + 1 + dCount1].content == Seed.EMPTY) {
+                        isEmptyFieldFound1 = true;
+                        dCount1++;
+                        countHelper = count1;
+                    } else {
+                        count1++;
+                    }
+
                 }
+
+                if (countHelper == count1) {
+                    dCount1 = 0;
+                    isEmptyFieldFound1 = false;
+                }
+
                 count2 = 0;
-                while ((j1 - count2 - 1 >= 0) &&
-                        playGround.getBoard().cells[i1][j1 - count2 - 1].content == opponentSeed) {
-                    count2++;
+                int dCount2 = 0;
+                countHelper = 0;
+                boolean isEmptyFieldFound2 = false;
+                while ((j1 - count2 - 1 - dCount2 >= 0) &&
+                        (playGround.getBoard().cells[i1][j1 - count2 - 1 - dCount2].content == opponentSeed ||
+                                (playGround.getBoard().cells[i1][j1 - count2 - 1 - dCount2].content == Seed.EMPTY && !isEmptyFieldFound2))) {
+                    if (playGround.getBoard().cells[i1][j1 - count2 - 1 - dCount2].content == Seed.EMPTY) {
+                        isEmptyFieldFound2 = true;
+                        dCount2++;
+                        countHelper = count2;
+                    } else {
+                        count2++;
+                    }
+
                 }
+
+                if (countHelper == count2) {
+                    dCount2 = 0;
+                    isEmptyFieldFound2 = false;
+                }
+
+                if (isEmptyFieldFound1 && isEmptyFieldFound2) {
+                    if (count1 >= count2) {
+                        count2 = 0;
+                    } else {
+                        count1 = 0;
+                    }
+                }
+
+
                 if (((count1 + count2) >= playGround.getBoard().numberToWin - 3 &&
-                        j1 + count1 + 1 < playGround.getBoard().COLS &&
-                        playGround.getBoard().cells[i1][j1 + count1 + 1].content == Seed.EMPTY &&
-                        j1 - count2 - 1 >= 0 &&
-                        playGround.getBoard().cells[i1][j1 - count2 - 1].content == Seed.EMPTY &&
-                        ((j1 + count1 + 2 < playGround.getBoard().COLS &&
-                                playGround.getBoard().cells[i1][j1 + count1 + 2].content == Seed.EMPTY) ||
-                                (j1 - count2 - 2 >= 0 &&
-                                        playGround.getBoard().cells[i1][j1 - count2 - 2].content == Seed.EMPTY))
+                        j1 + count1 + 1 + dCount1 < playGround.getBoard().COLS &&
+                        playGround.getBoard().cells[i1][j1 + count1 + 1 + dCount1].content == Seed.EMPTY &&
+                        j1 - count2 - 1 - dCount2 >= 0 &&
+                        playGround.getBoard().cells[i1][j1 - count2 - 1 - dCount2].content == Seed.EMPTY &&
+                        ((j1 + count1 + 2 + dCount1 < playGround.getBoard().COLS &&
+                                playGround.getBoard().cells[i1][j1 + count1 + 2 + dCount1].content == Seed.EMPTY) ||
+                                (j1 - count2 - 2 - dCount2 >= 0 &&
+                                        playGround.getBoard().cells[i1][j1 - count2 - 2 - dCount2].content == Seed.EMPTY))
                 ) || // or numberToWin-1 in row and one empty field
                         ((count1 + count2) >= playGround.getBoard().numberToWin - 2 &&
-                                ((j1 + count1 + 1 < playGround.getBoard().COLS &&
-                                        playGround.getBoard().cells[i1][j1 + count1 + 1].content == Seed.EMPTY) ||
-                                        (j1 - count2 - 1 >= 0 &&
-                                                playGround.getBoard().cells[i1][j1 - count2 - 1].content == Seed.EMPTY)))) {
+                                ((j1 + count1 + 1 + dCount1 < playGround.getBoard().COLS &&
+                                        playGround.getBoard().cells[i1][j1 + count1 + 1 + dCount1].content == Seed.EMPTY) ||
+                                        (j1 - count2 - 1 - dCount2 >= 0 &&
+                                                playGround.getBoard().cells[i1][j1 - count2 - 1 - dCount2].content == Seed.EMPTY)))) {
                     countTotalRow = 1;
                 }
 
                 // vertikal
                 count1 = 0;
-                while (((i1 + count1 + 1) < playGround.getBoard().ROWS) &&
-                        playGround.getBoard().cells[i1 + count1 + 1][j1].content == opponentSeed) {
-                    count1++;
+                dCount1 = 0;
+                countHelper = 0;
+                isEmptyFieldFound1 = false;
+                while (((i1 + count1 + 1 + dCount1) < playGround.getBoard().ROWS) &&
+                        (playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1].content == opponentSeed ||
+                                (playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1].content == Seed.EMPTY && !isEmptyFieldFound1))) {
+                    if (playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1].content == Seed.EMPTY) {
+                        isEmptyFieldFound1 = true;
+                        dCount1++;
+                        countHelper = count1;
+                    } else {
+                        count1++;
+                    }
+
                 }
+
+                if (countHelper == count1) {
+                    dCount1 = 0;
+                    isEmptyFieldFound1 = false;
+                }
+
                 count2 = 0;
-                while ((i1 - count2 - 1 >= 0) &&
-                        playGround.getBoard().cells[i1 - count2 - 1][j1].content == opponentSeed) {
-                    count2++;
+                dCount2 = 0;
+                countHelper = 0;
+                isEmptyFieldFound2 = false;
+                while ((i1 - count2 - 1 - dCount2 >= 0) &&
+                        (playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1].content == opponentSeed ||
+                                (playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1].content == Seed.EMPTY && !isEmptyFieldFound2))) {
+                    if (playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1].content == Seed.EMPTY) {
+                        isEmptyFieldFound2 = true;
+                        dCount2++;
+                        countHelper = count2;
+                    } else {
+                        count2++;
+                    }
+
+                }
+
+                if (countHelper == count2) {
+                    dCount2 = 0;
+                    isEmptyFieldFound2 = false;
+                }
+
+                if (isEmptyFieldFound1 && isEmptyFieldFound2) {
+                    if (count1 >= count2) {
+                        count2 = 0;
+                    } else {
+                        count1 = 0;
+                    }
                 }
 
                 if ((count1 + count2) >= playGround.getBoard().numberToWin - 3 &&
-                        i1 + count1 + 1 < playGround.getBoard().ROWS &&
-                        playGround.getBoard().cells[i1 + count1 + 1][j1].content == Seed.EMPTY &&
-                        i1 - count2 - 1 >= 0 &&
-                        playGround.getBoard().cells[i1 - count2 - 1][j1].content == Seed.EMPTY &&
-                        ((i1 + count1 + 2 < playGround.getBoard().ROWS &&
-                                playGround.getBoard().cells[i1 + count1 + 2][j1].content == Seed.EMPTY) ||
-                                (i1 - count2 - 2 >= 0 &&
-                                        playGround.getBoard().cells[i1 - count2 - 2][j1].content == Seed.EMPTY)) ||
+                        i1 + count1 + 1 + dCount1 < playGround.getBoard().ROWS &&
+                        playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1].content == Seed.EMPTY &&
+                        i1 - count2 - 1 - dCount2 >= 0 &&
+                        playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1].content == Seed.EMPTY &&
+                        ((i1 + count1 + 2 + dCount1 < playGround.getBoard().ROWS &&
+                                playGround.getBoard().cells[i1 + count1 + 2 + dCount1][j1].content == Seed.EMPTY) ||
+                                (i1 - count2 - 2 - dCount2 >= 0 &&
+                                        playGround.getBoard().cells[i1 - count2 - 2 - dCount2][j1].content == Seed.EMPTY)) ||
                         // or numberToWin-1 in row and one empty field
                         (((count1 + count2) >= playGround.getBoard().numberToWin - 2) &&
-                                ((i1 + count1 + 1 < playGround.getBoard().ROWS &&
-                                        playGround.getBoard().cells[i1 + count1 + 1][j1].content == Seed.EMPTY) ||
-                                        (i1 - count2 - 1 >= 0 &&
-                                                playGround.getBoard().cells[i1 - count2 - 1][j1].content == Seed.EMPTY)))) {
+                                ((i1 + count1 + 1 + dCount1 < playGround.getBoard().ROWS &&
+                                        playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1].content == Seed.EMPTY) ||
+                                        (i1 - count2 - 1 - dCount2 >= 0 &&
+                                                playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1].content == Seed.EMPTY)))) {
                     countTotalCol = 1;
                 }
 
 
                 //diagonal 1
                 count1 = 0;
-                while ((i1 + count1 + 1) < playGround.getBoard().ROWS &&
-                        (j1 + count1 + 1) < playGround.getBoard().COLS &&
-                        playGround.getBoard().cells[i1 + count1 + 1][j1 + count1 + 1].content == opponentSeed) {
-                    count1++;
+                dCount1 = 0;
+                countHelper = 0;
+                isEmptyFieldFound1 = false;
+                while ((i1 + count1 + 1 + dCount1) < playGround.getBoard().ROWS &&
+                        (j1 + count1 + 1 + dCount1) < playGround.getBoard().COLS &&
+                        (playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1 + count1 + 1 + dCount1].content == opponentSeed ||
+                                (playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1 + count1 + 1 + dCount1].content == Seed.EMPTY && !isEmptyFieldFound1))) {
+                    if (playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1 + count1 + 1 + dCount1].content == Seed.EMPTY) {
+                        isEmptyFieldFound1 = true;
+                        dCount1++;
+                        countHelper = count1;
+                    } else {
+                        count1++;
+                    }
+
                 }
+
+                if (countHelper == count1) {
+                    dCount1 = 0;
+                    isEmptyFieldFound1 = false;
+                }
+
                 count2 = 0;
-                while ((i1 - count2 - 1) >= 0 && (j1 - count2 - 1) >= 0 &&
-                        playGround.getBoard().cells[i1 - count2 - 1][j1 - count2 - 1].content == opponentSeed) {
-                    count2++;
+                dCount2 = 0;
+                countHelper = 0;
+                isEmptyFieldFound2 = false;
+                while ((i1 - count2 - 1 - dCount2) >= 0 && (j1 - count2 - 1 - dCount2) >= 0 &&
+                        (playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1 - count2 - 1 - dCount2].content == opponentSeed ||
+                                (playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1 - count2 - 1 - dCount2].content == Seed.EMPTY && !isEmptyFieldFound2))) {
+                    if (playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1 - count2 - 1 - dCount2].content == Seed.EMPTY) {
+                        isEmptyFieldFound2 = true;
+                        dCount2++;
+                        countHelper = count2;
+                    } else {
+                        count2++;
+                    }
+
+                }
+
+                if (countHelper == count2) {
+                    dCount2 = 0;
+                    isEmptyFieldFound2 = false;
+                }
+
+                if (isEmptyFieldFound1 && isEmptyFieldFound2) {
+                    if (count1 >= count2) {
+                        count2 = 0;
+                    } else {
+                        count1 = 0;
+                    }
                 }
 
                 if ((count1 + count2) >= playGround.getBoard().numberToWin - 3 &&
-                        i1 + count1 + 1 < playGround.getBoard().ROWS &&
-                        j1 + count1 + 1 < playGround.getBoard().COLS &&
-                        playGround.getBoard().cells[i1 + count1 + 1][j1 + count1 + 1].content == Seed.EMPTY &&
-                        j1 - count2 - 1 >= 0 &&
-                        i1 - count2 - 1 >= 0 &&
-                        playGround.getBoard().cells[i1 - count2 - 1][j1 - count2 - 1].content == Seed.EMPTY &&
-                        ((i1 + count1 + 2 < playGround.getBoard().ROWS &&
-                                j1 + count1 + 2 < playGround.getBoard().COLS &&
-                                playGround.getBoard().cells[i1 + count1 + 2][j1 + count1 + 2].content == Seed.EMPTY) ||
-                                (j1 - count2 - 2 >= 0 &&
-                                        i1 - count2 - 2 >= 0 &&
-                                        playGround.getBoard().cells[i1 - count2 - 2][j1 - count2 - 2].content == Seed.EMPTY))
+                        i1 + count1 + 1 + dCount1 < playGround.getBoard().ROWS &&
+                        j1 + count1 + 1 + dCount1 < playGround.getBoard().COLS &&
+                        playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1 + count1 + 1 + dCount1].content == Seed.EMPTY &&
+                        j1 - count2 - 1 - dCount2 >= 0 &&
+                        i1 - count2 - 1 - dCount2 >= 0 &&
+                        playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1 - count2 - 1 - dCount2].content == Seed.EMPTY &&
+                        ((i1 + count1 + 2 + dCount1 < playGround.getBoard().ROWS &&
+                                j1 + count1 + 2 + dCount1 < playGround.getBoard().COLS &&
+                                playGround.getBoard().cells[i1 + count1 + 2 + dCount1][j1 + count1 + 2 + dCount1].content == Seed.EMPTY) ||
+                                (j1 - count2 - 2 - dCount2 >= 0 &&
+                                        i1 - count2 - 2 - dCount2 >= 0 &&
+                                        playGround.getBoard().cells[i1 - count2 - 2 - dCount2][j1 - count2 - 2 - dCount2].content == Seed.EMPTY))
                         ||// or numberToWin-1 in row and one empty field
                         ((count1 + count2) >= playGround.getBoard().numberToWin - 2 &&
-                                ((i1 + count1 + 1 < playGround.getBoard().ROWS &&
-                                        j1 + count1 + 1 < playGround.getBoard().COLS &&
-                                        playGround.getBoard().cells[i1 + count1 + 1][j1 + count1 + 1].content == Seed.EMPTY) ||
-                                        (j1 - count2 - 1 >= 0 &&
-                                                i1 - count2 - 1 >= 0 &&
-                                                playGround.getBoard().cells[i1 - count2 - 1][j1 - count2 - 1].content == Seed.EMPTY)))) {
+                                ((i1 + count1 + 1 + dCount1 < playGround.getBoard().ROWS &&
+                                        j1 + count1 + 1 + dCount1 < playGround.getBoard().COLS &&
+                                        playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1 + count1 + 1 + dCount1].content == Seed.EMPTY) ||
+                                        (j1 - count2 - 1 - dCount2 >= 0 &&
+                                                i1 - count2 - 1 - dCount2 >= 0 &&
+                                                playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1 - count2 - 1 - dCount2].content == Seed.EMPTY)))) {
                     countTotalDiag1 = 1;
                 }
 
                 //diagonal 2
                 count1 = 0;
-                while ((i1 + count1 + 1) < playGround.getBoard().ROWS &&
-                        (j1 - count1 - 1) >= 0 &&
-                        playGround.getBoard().cells[i1 + count1 + 1][j1 - count1 - 1].content == opponentSeed) {
-                    count1++;
+                dCount1 = 0;
+                countHelper = 0;
+                isEmptyFieldFound1 = false;
+                while ((i1 + count1 + 1 + dCount1) < playGround.getBoard().ROWS &&
+                        (j1 - count1 - 1 - dCount1) >= 0 &&
+                        (playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1 - count1 - 1 - dCount1].content == opponentSeed ||
+                                (playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1 - count1 - 1 - dCount1].content == Seed.EMPTY && !isEmptyFieldFound1))) {
+                    if (playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1 - count1 - 1 - dCount1].content == Seed.EMPTY) {
+                        isEmptyFieldFound1 = true;
+                        dCount1++;
+                        countHelper = count1;
+                    } else {
+                        count1++;
+                    }
+
                 }
+
+                if (countHelper == count1) {
+                    dCount1 = 0;
+                    isEmptyFieldFound1 = false;
+                }
+
                 count2 = 0;
-                while ((i1 - count2 - 1) >= 0 && (j1 + count2 + 1) < playGround.getBoard().COLS &&
-                        playGround.getBoard().cells[i1 - count2 - 1][j1 + count2 + 1].content == opponentSeed) {
-                    count2++;
+                dCount2 = 0;
+                countHelper = 0;
+                isEmptyFieldFound2 = false;
+                while ((i1 - count2 - 1 - dCount2) >= 0 && (j1 + count2 + 1 + dCount2) < playGround.getBoard().COLS &&
+                        (playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1 + count2 + 1 + dCount2].content == opponentSeed ||
+                                (playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1 + count2 + 1 + dCount2].content == Seed.EMPTY && !isEmptyFieldFound2))) {
+                    if (playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1 + count2 + 1 + dCount2].content == Seed.EMPTY) {
+                        isEmptyFieldFound2 = true;
+                        dCount2++;
+                        countHelper = count2;
+                    } else {
+                        count2++;
+                    }
+
+                }
+
+                if (countHelper == count2) {
+                    dCount2 = 0;
+                    isEmptyFieldFound2 = false;
+                }
+
+                if (isEmptyFieldFound1 && isEmptyFieldFound2) {
+                    if (count1 >= count2) {
+                        count2 = 0;
+                    } else {
+                        count1 = 0;
+                    }
                 }
 
                 if ((count1 + count2) >= playGround.getBoard().numberToWin - 3 &&
-                        i1 + count1 + 1 < playGround.getBoard().ROWS &&
-                        j1 - count1 - 1 >= 0 &&
-                        playGround.getBoard().cells[i1 + count1 + 1][j1 - count1 - 1].content == Seed.EMPTY &&
-                        j1 + count2 + 1 < playGround.getBoard().COLS &&
-                        i1 - count2 - 1 >= 0 &&
-                        playGround.getBoard().cells[i1 - count2 - 1][j1 + count2 + 1].content == Seed.EMPTY &&
-                        ((i1 + count1 + 2 < playGround.getBoard().ROWS &&
-                                j1 - count1 - 2 >= 0 &&
-                                playGround.getBoard().cells[i1 + count1 + 2][j1 - count1 - 2].content == Seed.EMPTY) ||
-                                (j1 + count2 + 2 < playGround.getBoard().COLS &&
-                                        i1 - count2 - 2 >= 0 &&
-                                        playGround.getBoard().cells[i1 - count2 - 2][j1 + count2 + 2].content == Seed.EMPTY))
+                        i1 + count1 + 1 + dCount1 < playGround.getBoard().ROWS &&
+                        j1 - count1 - 1 - dCount1 >= 0 &&
+                        playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1 - count1 - 1 - dCount1].content == Seed.EMPTY &&
+                        j1 + count2 + 1 + dCount2 < playGround.getBoard().COLS &&
+                        i1 - count2 - 1 - dCount2 >= 0 &&
+                        playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1 + count2 + 1 + dCount2].content == Seed.EMPTY &&
+                        ((i1 + count1 + 2 + dCount1 < playGround.getBoard().ROWS &&
+                                j1 - count1 - 2 - dCount1 >= 0 &&
+                                playGround.getBoard().cells[i1 + count1 + 2 + dCount1][j1 - count1 - 2 - dCount1].content == Seed.EMPTY) ||
+                                (j1 + count2 + 2 + dCount2 < playGround.getBoard().COLS &&
+                                        i1 - count2 - 2 - dCount2 >= 0 &&
+                                        playGround.getBoard().cells[i1 - count2 - 2 - dCount2][j1 + count2 + 2 + dCount2].content == Seed.EMPTY))
                         || // or numberToWin-1 in row and one empty field
                         ((count1 + count2) >= playGround.getBoard().numberToWin - 2 &&
-                                ((i1 + count1 + 1 < playGround.getBoard().ROWS &&
-                                        j1 - count1 - 1 >= 0 &&
-                                        playGround.getBoard().cells[i1 + count1 + 1][j1 - count1 - 1].content == Seed.EMPTY) ||
-                                        (j1 + count2 + 1 < playGround.getBoard().COLS &&
-                                                i1 - count2 - 1 >= 0 &&
-                                                playGround.getBoard().cells[i1 - count2 - 1][j1 + count2 + 1].content == Seed.EMPTY)))) {
+                                ((i1 + count1 + 1 + dCount1 < playGround.getBoard().ROWS &&
+                                        j1 - count1 - 1 - dCount1 >= 0 &&
+                                        playGround.getBoard().cells[i1 + count1 + 1 + dCount1][j1 - count1 - 1 - dCount1].content == Seed.EMPTY) ||
+                                        (j1 + count2 + 1 + dCount2 < playGround.getBoard().COLS &&
+                                                i1 - count2 - 1 - dCount2 >= 0 &&
+                                                playGround.getBoard().cells[i1 - count2 - 1 - dCount2][j1 + count2 + 1 + dCount2].content == Seed.EMPTY)))) {
                     countTotalDiag2 = 1;
                 }
 
