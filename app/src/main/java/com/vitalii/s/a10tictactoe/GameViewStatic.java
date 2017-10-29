@@ -65,7 +65,8 @@ import playground.State;
 /**
  * Created by user on 30.10.2016.
  */
-public class GameViewStatic extends View implements SoundPool.OnLoadCompleteListener {
+public class GameViewStatic extends View {
+    //implements SoundPool.OnLoadCompleteListener {
 
 
     public class GameThread extends Thread {
@@ -98,6 +99,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                             && simplePlayGround.getCurrentPlayer() == playerSeed
                             && simplePlayGround.getBoard().cells[i][j].content == Seed.EMPTY) {
                         simplePlayGround.doStep(i, j);
+                        if (mSoundLoaded&&isSound) playSound(mMoveSound);
                         countMove++;
                         ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
                                 Integer.toString(countMove));
@@ -105,19 +107,29 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
 
                         if (simplePlayGround.getBoard().hasWon(playerSeed)) {
                             playerWin++;
-                            streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
+                            if (mSoundLoaded&&isSound) {
+                                mStreamID = playSound(mWinSound);
+                            }
+                            showWinner();
+                            //streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                             if (bestScore == 0) {
                                 bestScore = countMove;
                                 saveBestScore(bestScore);
+                                ((MainActivity) getContext()).showBestScoreFragment();
+                                mSoundPool.stop(mStreamID);
+                                if (mSoundLoaded&&isSound) playSound(mBestScoreSound);
                             } else if (countMove < bestScore) {
                                 bestScore = countMove;
                                 saveBestScore(bestScore);
+                                ((MainActivity) getContext()).showBestScoreFragment();
+                                mSoundPool.stop(mStreamID);
+                                if (mSoundLoaded&&isSound) playSound(mBestScoreSound);
                             }
-                            showWinner();
-                            ((MainActivity) getContext()).showBestScoreFragment();
+
+
                             ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
                                     Integer.toString(countMove));
-                            mSoundPool.stop(streamId);
+                            //mSoundPool.stop(streamId);
 
                         } else {
                             try {
@@ -139,6 +151,7 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                 long start = System.nanoTime();
 
                 makeBotMove();
+                if (mSoundLoaded&&isSound) playSound(mMoveSound);
                 if (Thread.currentThread().isInterrupted()) {
                     return;
                 }
@@ -153,9 +166,10 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                 }
                 postInvalidate();
                 if (simplePlayGround.getBoard().hasWon(playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT)) {
-                    streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
+                    //streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
+                    if (mSoundLoaded&&isSound) playSound(mWinSound);
                     showWinner();
-                    mSoundPool.stop(streamId);
+                    //mSoundPool.stop(streamId);
                 }
 
             }
@@ -271,13 +285,20 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     int bestScore;
     private HotelDbHelper mDbHelper;
 
+    private int mMoveSound;
+    private int mWinSound;
+    private int mBestScoreSound;
+    private AssetManager mAssetManager;
+    private int mStreamID;
+    private boolean mSoundLoaded = false;
+
 
     public GameViewStatic(Context context) {
         super(context);
         this.context = context;
-        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
-        mSoundPool.setOnLoadCompleteListener(this);
-        soundID = mSoundPool.load(context, R.raw.win, 1);
+//        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
+//        mSoundPool.setOnLoadCompleteListener(this);
+//        soundID = mSoundPool.load(context, R.raw.win, 1);
         init();
 
     }
@@ -286,9 +307,9 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public GameViewStatic(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
-        mSoundPool.setOnLoadCompleteListener(this);
-        soundID = mSoundPool.load(context, R.raw.win, 1);
+//        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
+//        mSoundPool.setOnLoadCompleteListener(this);
+//        soundID = mSoundPool.load(context, R.raw.win, 1);
         init();
     }
 
@@ -296,15 +317,38 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     public GameViewStatic(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.context = context;
-        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
-        mSoundPool.setOnLoadCompleteListener(this);
-        soundID = mSoundPool.load(context, R.raw.win, 1);
+//        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
+//        mSoundPool.setOnLoadCompleteListener(this);
+//        soundID = mSoundPool.load(context, R.raw.win, 1);
         init();
     }
 
     public void init() {
 
-        //((MainActivity)getContext()).findViewById(R.id.toolbarTextView).setVisibility(VISIBLE);
+
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            // Для устройств до Android 5
+            createOldSoundPool();
+        } else {
+            // Для новых устройств
+            createNewSoundPool();
+        }
+        mSoundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool soundPool, int sampleId,
+                                       int status) {
+                mSoundLoaded = true;
+            }
+        });
+
+        mAssetManager = getContext().getAssets();
+
+         //получим идентификаторы
+        mMoveSound = loadSound("moveSoundNew.wav");
+        mBestScoreSound= loadSound("bestScoreSound.wav");
+        mWinSound = loadSound("win.mp3");
+
+
         mPaint = new Paint();
         mPaint.setColor(Color.BLACK);
         mPaint.setStrokeWidth(LINE_WIDTH_NORMAL);
@@ -385,10 +429,10 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
     }
 
 
-    @Override
-    public void onLoadComplete(SoundPool soundPool, int i, int i1) {
-
-    }
+//    @Override
+//    public void onLoadComplete(SoundPool soundPool, int i, int i1) {
+//
+//    }
 
 
     @Override
@@ -872,6 +916,45 @@ public class GameViewStatic extends View implements SoundPool.OnLoadCompleteList
                     displayDataBaseInfo(HoteContract.BestScore.TABLE_NAME_DIFF_HARD_NOUGHT));
         }
 
+    }
+
+    @SuppressWarnings("deprecation")
+    private void createOldSoundPool() {
+        mSoundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void createNewSoundPool() {
+        AudioAttributes attributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+        mSoundPool = new SoundPool.Builder()
+                .setAudioAttributes(attributes)
+                .build();
+    }
+
+    private int loadSound(String fileName) {
+        AssetFileDescriptor afd;
+        try {
+            afd = mAssetManager.openFd(fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Не могу загрузить файл " + fileName,
+                    Toast.LENGTH_SHORT).show();
+            return -1;
+        }
+        return mSoundPool.load(afd, 1);
+    }
+
+    private int playSound(int sound) {
+
+        if (sound > 0) {
+            mStreamID = mSoundPool.play(sound, 1, 1, 1, 0, 1);
+        }
+
+        System.out.println("playing sound");
+        return mStreamID;
     }
 
 
