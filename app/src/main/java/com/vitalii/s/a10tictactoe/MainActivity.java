@@ -1,8 +1,15 @@
 package com.vitalii.s.a10tictactoe;
 
 
+import android.annotation.TargetApi;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.Rect;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.os.Build;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import java.io.IOException;
+
 import playground.Seed;
 import playground.SimplePlayGround;
 
@@ -25,10 +34,11 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     //private static final String SAVED_BOARD_SIZE = "saved board size";
-    public GameViewStatic gameView;
+    GameViewStatic gameView;
     public TextView scoreText;
     public SharedPreferences mPref;
     public TextView barText;
+    public Toolbar toolbar;
 
 
     @Override
@@ -44,7 +54,7 @@ public class MainActivity extends AppCompatActivity
         }
         gameView = (GameViewStatic) findViewById(R.id.viewStatic);
         //loadSavedPreferences();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         showBestScore();
@@ -60,6 +70,17 @@ public class MainActivity extends AppCompatActivity
         //Toast.makeText(this,"SHaredPreferences"+mPref.getInt(SAVED_BOARD_SIZE,100),Toast.LENGTH_SHORT).show();
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Sound.init(this);
+
+    }
+
+
+
+
 
     @Override
     public void onBackPressed() {

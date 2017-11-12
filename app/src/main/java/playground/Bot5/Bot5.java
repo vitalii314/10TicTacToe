@@ -863,8 +863,14 @@ public class Bot5 implements Playable {
             return move;
         } else {      // no moves were made yet, comp playing cross;
             if (playGround.getBoard().cells.length == 3) {
-                move[0] = 1;
-                move[1] = 1;
+
+                if (this.difficulty == GameViewStatic.DIFFICULTY_HARD) {
+                    move[0] = 1;
+                    move[1] = 1;
+                } else {
+                    move[0] = (int) (Math.random() * 3);
+                    move[1] = (int) (Math.random() * 3);
+                }
             } else {
                 move[0] = (int) (Math.random() * 4) + 3;
                 move[1] = (int) (Math.random() * 4) + 3;

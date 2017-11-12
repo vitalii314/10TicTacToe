@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -99,7 +100,7 @@ public class GameViewStatic extends View {
                             && simplePlayGround.getCurrentPlayer() == playerSeed
                             && simplePlayGround.getBoard().cells[i][j].content == Seed.EMPTY) {
                         simplePlayGround.doStep(i, j);
-                        if (mSoundLoaded&&isSound) playSound(mMoveSound);
+                        if (isSound) Sound.playMoveSound();
                         countMove++;
                         ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
                                 Integer.toString(countMove));
@@ -107,23 +108,22 @@ public class GameViewStatic extends View {
 
                         if (simplePlayGround.getBoard().hasWon(playerSeed)) {
                             playerWin++;
-                            if (mSoundLoaded&&isSound) {
-                                mStreamID = playSound(mWinSound);
-                            }
+                            if (isSound) Sound.playWinSound();
                             showWinner();
                             //streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
                             if (bestScore == 0) {
                                 bestScore = countMove;
                                 saveBestScore(bestScore);
                                 ((MainActivity) getContext()).showBestScoreFragment();
-                                mSoundPool.stop(mStreamID);
-                                if (mSoundLoaded&&isSound) playSound(mBestScoreSound);
+                                Sound.stopSound();
+                                if (isSound) Sound.playBestScoreSound();
                             } else if (countMove < bestScore) {
                                 bestScore = countMove;
                                 saveBestScore(bestScore);
                                 ((MainActivity) getContext()).showBestScoreFragment();
-                                mSoundPool.stop(mStreamID);
-                                if (mSoundLoaded&&isSound) playSound(mBestScoreSound);
+                                Sound.stopSound();
+                                if (isSound) Sound.playBestScoreSound();
+
                             }
 
 
@@ -151,7 +151,7 @@ public class GameViewStatic extends View {
                 long start = System.nanoTime();
 
                 makeBotMove();
-                if (mSoundLoaded&&isSound) playSound(mMoveSound);
+                if (isSound) Sound.playMoveSound();
                 if (Thread.currentThread().isInterrupted()) {
                     return;
                 }
@@ -167,7 +167,8 @@ public class GameViewStatic extends View {
                 postInvalidate();
                 if (simplePlayGround.getBoard().hasWon(playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT)) {
                     //streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
-                    if (mSoundLoaded&&isSound) playSound(mWinSound);
+//                    if (mSoundLoaded&&isSound) playSound(mWinSound);
+                    Sound.playWinSound();
                     showWinner();
                     //mSoundPool.stop(streamId);
                 }
@@ -285,13 +286,6 @@ public class GameViewStatic extends View {
     int bestScore;
     private HotelDbHelper mDbHelper;
 
-    private int mMoveSound;
-    private int mWinSound;
-    private int mBestScoreSound;
-    private AssetManager mAssetManager;
-    private int mStreamID;
-    private boolean mSoundLoaded = false;
-
 
     public GameViewStatic(Context context) {
         super(context);
@@ -324,29 +318,6 @@ public class GameViewStatic extends View {
     }
 
     public void init() {
-
-
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            // Для устройств до Android 5
-            createOldSoundPool();
-        } else {
-            // Для новых устройств
-            createNewSoundPool();
-        }
-        mSoundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-            @Override
-            public void onLoadComplete(SoundPool soundPool, int sampleId,
-                                       int status) {
-                mSoundLoaded = true;
-            }
-        });
-
-        mAssetManager = getContext().getAssets();
-
-         //получим идентификаторы
-        mMoveSound = loadSound("moveSoundNew.wav");
-        mBestScoreSound= loadSound("bestScoreSound.wav");
-        mWinSound = loadSound("win.mp3");
 
 
         mPaint = new Paint();
@@ -446,6 +417,15 @@ public class GameViewStatic extends View {
             final float scaleFactorY;
             int size = simplePlayGround.getBoard().cells.length;
 
+
+//            if (size==BOARD_SIZE_3) {
+//                Toast.makeText(getContext(), Integer.toString(Math.round (getWidth()/GameViewStatic.LINE_WIDTH_NORMAL)), Toast.LENGTH_SHORT).show();
+//            }
+//
+//            if (size==BOARD_SIZE_10) {
+//                Toast.makeText(getContext(),Integer.toString(Math.round (getWidth()/(GameViewStatic.LINE_WIDTH_NORMAL/2))), Toast.LENGTH_SHORT).show();
+//            }
+
             if (getWidth() > WIDTH || getHeight() > HEIGHT) {
                 scaleFactorX = (float) getWidth() / WIDTH;
                 scaleFactorY = (float) getHeight() / HEIGHT;
@@ -459,16 +439,31 @@ public class GameViewStatic extends View {
             canvas.drawBitmap(bitmap, 0, 0, null);
             canvas.restoreToCount(savedState);
 
-            mPaint.setStrokeWidth(simplePlayGround.getBoard().cells.length == 3 ? LINE_WIDTH_NORMAL : LINE_WIDTH_NORMAL / 2);
-            mCirclePaint.setStrokeWidth(simplePlayGround.getBoard().cells.length == 3 ? LINE_WIDTH_NORMAL : LINE_WIDTH_NORMAL / 2);
-            mCrossPaint.setStrokeWidth(simplePlayGround.getBoard().cells.length == 3 ? LINE_WIDTH_NORMAL : LINE_WIDTH_NORMAL / 2);
+            //mPaint.setStrokeWidth(simplePlayGround.getBoard().cells.length == 3 ? LINE_WIDTH_NORMAL : LINE_WIDTH_NORMAL / 2);
 
             int orient = getContext().getResources().getConfiguration().orientation;
-            if (orient == 1) {
-                fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getWidth() - 10) : (getWidth() / 2));
+            if (orient == 1) { //vertikal orientation
+                fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getWidth() - 70) : (getWidth() / 2));
+                int a = simplePlayGround.getBoard().cells.length == 3 ? Math.round(getWidth() / 76) : Math.round(getWidth() / 153);
+                mPaint.setStrokeWidth(a);
+                mCirclePaint.setStrokeWidth(a);
+                mCrossPaint.setStrokeWidth(a);
+                Toast.makeText(getContext(), "canvasWidth= " + Integer.toString(canvas.getWidth()), Toast.LENGTH_SHORT).show();
+
+
+
+
 
             } else {
-                fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getHeight() - 10) : getHeight() / 2);
+                fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getHeight() - 70) : getHeight() / 2);
+                int a = simplePlayGround.getBoard().cells.length == 3 ? Math.round(getHeight() / 76) : Math.round(getHeight() / 153);
+                mPaint.setStrokeWidth(a);
+                mCirclePaint.setStrokeWidth(a);
+                mCrossPaint.setStrokeWidth(a);
+                Toast.makeText(getContext(), "canvasHeight = " + Integer.toString(canvas.getHeight()), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "toolbar = " + Integer.toString(getToolBarHeight2()), Toast.LENGTH_SHORT).show();
+
+
 
             }
 
@@ -501,7 +496,12 @@ public class GameViewStatic extends View {
 
             for (int i = 0; i < simplePlayGround.getBoard().cells.length - 1; i++) {
                 float startPosX1;
-                float startPosY1 = (getHeight() - fieldLength) / 2;
+                float startPosY1;
+                if (orient == 1) {
+                    startPosY1 = (getHeight() - fieldLength) / 2;
+                } else {
+                    startPosY1 = (getHeight() - fieldLength) / 2 + getToolBarHeight();
+                }
                 float startPosY2 = startPosY1 + fieldLength;
 
                 if (i == 0) {
@@ -514,12 +514,17 @@ public class GameViewStatic extends View {
 
             }
 
-            // drawing horizontal lines
+            // drawing horizontal linesа
             for (int i = 0; i < simplePlayGround.getBoard().cells.length - 1; i++) {
 
                 float startPosX1 = (getWidth() - fieldLength) / 2;
                 float startPosX2 = startPosX1 + fieldLength;
-                float startPosY1 = ((getHeight() / 2) - fieldLength / 2) + (i + 1) * fieldLength / size;
+                float startPosY1;
+                if (orient == 1) {
+                    startPosY1 = ((getHeight() / 2) - fieldLength / 2) + (i + 1) * fieldLength / size;
+                } else {
+                    startPosY1 = ((getHeight() / 2) - fieldLength / 2) + (i + 1) * fieldLength / size + getToolBarHeight();
+                }
                 float startPosY2 = startPosY1;
                 canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
 
@@ -918,43 +923,16 @@ public class GameViewStatic extends View {
 
     }
 
-    @SuppressWarnings("deprecation")
-    private void createOldSoundPool() {
-        mSoundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+    public int getToolBarHeight() {
+        int[] attrs = new int[]{R.attr.actionBarSize};
+        TypedArray ta = getContext().obtainStyledAttributes(attrs);
+        int toolBarHeight = ta.getDimensionPixelSize(0, -1);
+        ta.recycle();
+        return toolBarHeight;
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void createNewSoundPool() {
-        AudioAttributes attributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_GAME)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build();
-        mSoundPool = new SoundPool.Builder()
-                .setAudioAttributes(attributes)
-                .build();
-    }
-
-    private int loadSound(String fileName) {
-        AssetFileDescriptor afd;
-        try {
-            afd = mAssetManager.openFd(fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(getContext(), "Не могу загрузить файл " + fileName,
-                    Toast.LENGTH_SHORT).show();
-            return -1;
-        }
-        return mSoundPool.load(afd, 1);
-    }
-
-    private int playSound(int sound) {
-
-        if (sound > 0) {
-            mStreamID = mSoundPool.play(sound, 1, 1, 1, 0, 1);
-        }
-
-        System.out.println("playing sound");
-        return mStreamID;
+    public int getToolBarHeight2() {
+       return ((MainActivity)getContext()).toolbar.getHeight();
     }
 
 
