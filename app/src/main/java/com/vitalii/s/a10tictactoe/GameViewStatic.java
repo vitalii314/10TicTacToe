@@ -1,63 +1,36 @@
 package com.vitalii.s.a10tictactoe;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
+
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
 import android.media.SoundPool;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.os.ParcelableCompat;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
-import android.widget.Checkable;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.gson.Gson;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vitalii.s.a10tictactoe.Data.HoteContract;
 import com.vitalii.s.a10tictactoe.Data.HotelDbHelper;
-
-import org.w3c.dom.Text;
-
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-
-import playground.Board;
 import playground.Bot5.Bot5;
-import playground.Cell;
 import playground.Seed;
 import playground.SimplePlayGround;
 import playground.State;
@@ -67,7 +40,7 @@ import playground.State;
  * Created by user on 30.10.2016.
  */
 public class GameViewStatic extends View {
-    //implements SoundPool.OnLoadCompleteListener {
+
 
 
     public class GameThread extends Thread {
@@ -85,12 +58,6 @@ public class GameViewStatic extends View {
                 }
             }
 
-//            ((Activity) context).runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(getContext(), "new thread started", Toast.LENGTH_SHORT).show();
-//                }
-//            });
 
 
             for (int i = 0; i < rects.length; i++) {
@@ -110,14 +77,13 @@ public class GameViewStatic extends View {
                             playerWin++;
                             if (isSound) Sound.playWinSound();
                             showWinner();
-                            //streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
-                            if (bestScore == 0) {
+                            if (bestScore == 0 && boardSize == BOARD_SIZE_10) {
                                 bestScore = countMove;
                                 saveBestScore(bestScore);
                                 ((MainActivity) getContext()).showBestScoreFragment();
                                 Sound.stopSound();
                                 if (isSound) Sound.playBestScoreSound();
-                            } else if (countMove < bestScore) {
+                            } else if (countMove < bestScore && boardSize == BOARD_SIZE_3) {
                                 bestScore = countMove;
                                 saveBestScore(bestScore);
                                 ((MainActivity) getContext()).showBestScoreFragment();
@@ -129,7 +95,6 @@ public class GameViewStatic extends View {
 
                             ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
                                     Integer.toString(countMove));
-                            //mSoundPool.stop(streamId);
 
                         } else {
                             try {
@@ -151,7 +116,7 @@ public class GameViewStatic extends View {
                 long start = System.nanoTime();
 
                 makeBotMove();
-                if (isSound) Sound.playMoveSound();
+
                 if (Thread.currentThread().isInterrupted()) {
                     return;
                 }
@@ -165,12 +130,11 @@ public class GameViewStatic extends View {
                     }
                 }
                 postInvalidate();
+                if (isSound) Sound.playMoveSound();
                 if (simplePlayGround.getBoard().hasWon(playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT)) {
-                    //streamId = mSoundPool.play(soundID, 1, 1, 0, 0, 1);
-//                    if (mSoundLoaded&&isSound) playSound(mWinSound);
+
                     Sound.playWinSound();
                     showWinner();
-                    //mSoundPool.stop(streamId);
                 }
 
             }
@@ -181,10 +145,11 @@ public class GameViewStatic extends View {
                 countMove = 0;
                 ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
                         Integer.toString(countMove));
-                //bot.start();
                 postInvalidate();
 
             }
+
+            if (queue.isEmpty()) queue.add("go");
 
         }
 
@@ -214,7 +179,7 @@ public class GameViewStatic extends View {
                 }
 
                 if (Thread.currentThread().isInterrupted()) return;
-//
+
                 postInvalidate();
                 try {
                     Thread.sleep(500);
@@ -227,7 +192,7 @@ public class GameViewStatic extends View {
                             cells[tempArr[0][0]][tempArr[0][1]].content = tempSeed[k];
 
                 }
-//
+
                 postInvalidate();
             }
 
@@ -243,6 +208,8 @@ public class GameViewStatic extends View {
     public final static int BOARD_SIZE_10 = 10;
     public final static int DIFFICULTY_EASY = 0;
     public final static int DIFFICULTY_HARD = 1;
+    private final static int NORMAL_FIELDLENGTH_3_IN_DP = 160;
+    private final static int NORMAL_FIELDLENGTH_10_IN_DP = 285;
 
     public final static String SAVED_BOARD_SIZE = "saved board size";
     private final static String SAVED_DIFFICULTY = "saved difficulty";
@@ -269,14 +236,9 @@ public class GameViewStatic extends View {
     GameThread gameThread = new GameThread();
     private boolean firstThread = false;
     private ArrayList winningFields = new ArrayList<>();
-    private SoundPool mSoundPool;
-    private int soundID;
-    private int streamId;
-    final int MAX_STREAMS = 5;
     final List<Target> targets = new ArrayList<>();
     public static int playerWin;
     public static int compWin;
-    public TextView textView;
     public float fieldLength;
     Seed playerSeed;
     int difficulty;
@@ -290,9 +252,6 @@ public class GameViewStatic extends View {
     public GameViewStatic(Context context) {
         super(context);
         this.context = context;
-//        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
-//        mSoundPool.setOnLoadCompleteListener(this);
-//        soundID = mSoundPool.load(context, R.raw.win, 1);
         init();
 
     }
@@ -301,9 +260,6 @@ public class GameViewStatic extends View {
     public GameViewStatic(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-//        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
-//        mSoundPool.setOnLoadCompleteListener(this);
-//        soundID = mSoundPool.load(context, R.raw.win, 1);
         init();
     }
 
@@ -311,9 +267,6 @@ public class GameViewStatic extends View {
     public GameViewStatic(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.context = context;
-//        mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
-//        mSoundPool.setOnLoadCompleteListener(this);
-//        soundID = mSoundPool.load(context, R.raw.win, 1);
         init();
     }
 
@@ -356,17 +309,19 @@ public class GameViewStatic extends View {
         simplePlayGround = new SimplePlayGround(boardSize, boardSize, boardSize == BOARD_SIZE_10 ? 5 : 3);
         simplePlayGround.start();
         rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
-        depth = (simplePlayGround.getBoard().cells.length == 3 ? 8 : 3);
+        if (boardSize == BOARD_SIZE_10) {
+            depth = 3;
+        } else {
+            depth = (difficulty == DIFFICULTY_HARD ? 8 : 5);
+        }
+
         countMove = 0;
         mDbHelper = new HotelDbHelper(getContext());
-        readBestScore();
+        if (boardSize == BOARD_SIZE_10) readBestScore();
 
 
-        //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.kletka3);
-        //bitmap = StartingActivity.getBitmapFromCache("1");
 
         firstThread = true;
-        //Toast.makeText(getContext(), "INIT", Toast.LENGTH_LONG).show();
         gameThread = new GameThread();
         gameThread.start();
 
@@ -394,16 +349,13 @@ public class GameViewStatic extends View {
         };
 
         targets.add(mTarget);
-        Picasso.with(getContext()).load(R.drawable.kletka3).
+        Picasso.with(getContext()).load(R.drawable.kletka).
                 memoryPolicy(MemoryPolicy.NO_STORE, MemoryPolicy.NO_CACHE).into(targets.get(0));
 
     }
 
 
-//    @Override
-//    public void onLoadComplete(SoundPool soundPool, int i, int i1) {
-//
-//    }
+
 
 
     @Override
@@ -411,20 +363,12 @@ public class GameViewStatic extends View {
 
 
         if (bitmap != null) {
-            //Toast.makeText(getContext(), "OnDraw", Toast.LENGTH_SHORT).show();
 
             final float scaleFactorX;
             final float scaleFactorY;
             int size = simplePlayGround.getBoard().cells.length;
 
 
-//            if (size==BOARD_SIZE_3) {
-//                Toast.makeText(getContext(), Integer.toString(Math.round (getWidth()/GameViewStatic.LINE_WIDTH_NORMAL)), Toast.LENGTH_SHORT).show();
-//            }
-//
-//            if (size==BOARD_SIZE_10) {
-//                Toast.makeText(getContext(),Integer.toString(Math.round (getWidth()/(GameViewStatic.LINE_WIDTH_NORMAL/2))), Toast.LENGTH_SHORT).show();
-//            }
 
             if (getWidth() > WIDTH || getHeight() > HEIGHT) {
                 scaleFactorX = (float) getWidth() / WIDTH;
@@ -436,60 +380,34 @@ public class GameViewStatic extends View {
             final int savedState = canvas.save();
             canvas.scale(scaleFactorX, scaleFactorY);
 
-            canvas.drawBitmap(bitmap, 0, 0, null);
+            //canvas.drawBitmap(bitmap, 0, 0, null);
             canvas.restoreToCount(savedState);
 
-            //mPaint.setStrokeWidth(simplePlayGround.getBoard().cells.length == 3 ? LINE_WIDTH_NORMAL : LINE_WIDTH_NORMAL / 2);
 
             int orient = getContext().getResources().getConfiguration().orientation;
             if (orient == 1) { //vertikal orientation
-                fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getWidth() - 70) : (getWidth() / 2));
-                int a = simplePlayGround.getBoard().cells.length == 3 ? Math.round(getWidth() / 76) : Math.round(getWidth() / 153);
-                mPaint.setStrokeWidth(a);
-                mCirclePaint.setStrokeWidth(a);
-                mCrossPaint.setStrokeWidth(a);
-                Toast.makeText(getContext(), "canvasWidth= " + Integer.toString(canvas.getWidth()), Toast.LENGTH_SHORT).show();
-
-
-
+                fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getWidth() - dpToPx(35)) : (getWidth() / 2));
+                float k = boardSize == 3 ? pxToDp(fieldLength) / NORMAL_FIELDLENGTH_3_IN_DP : pxToDp(fieldLength) / NORMAL_FIELDLENGTH_10_IN_DP;
+                float a = boardSize == 3 ? LINE_WIDTH_NORMAL * k : (LINE_WIDTH_NORMAL / 2) * k;
+                mPaint.setStrokeWidth(Math.round(a));
+                mCirclePaint.setStrokeWidth(Math.round(a));
+                mCrossPaint.setStrokeWidth(Math.round(a));
 
 
             } else {
-                fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getHeight() - 70) : getHeight() / 2);
-                int a = simplePlayGround.getBoard().cells.length == 3 ? Math.round(getHeight() / 76) : Math.round(getHeight() / 153);
-                mPaint.setStrokeWidth(a);
-                mCirclePaint.setStrokeWidth(a);
-                mCrossPaint.setStrokeWidth(a);
-                Toast.makeText(getContext(), "canvasHeight = " + Integer.toString(canvas.getHeight()), Toast.LENGTH_SHORT).show();
-                Toast.makeText(getContext(), "toolbar = " + Integer.toString(getToolBarHeight2()), Toast.LENGTH_SHORT).show();
+                fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? getHeight() - dpToPx(35) - getToolBarHeight() : getHeight() / 2);
 
+                float k = boardSize == 3 ? pxToDp(fieldLength) / NORMAL_FIELDLENGTH_3_IN_DP : pxToDp(fieldLength) / NORMAL_FIELDLENGTH_10_IN_DP;
+                float a = boardSize == 3 ? LINE_WIDTH_NORMAL * k : (LINE_WIDTH_NORMAL / 2) * k;
+                mPaint.setStrokeWidth(Math.round(a));
+                mCirclePaint.setStrokeWidth(Math.round(a));
+                mCrossPaint.setStrokeWidth(Math.round(a));
 
 
             }
 
-//            float startPosX1 = (getWidth() - fieldLength) / 2 + fieldLength / size;
-//            float startPosY1 = (getHeight() - fieldLength) / 2;
-//            float startPosX2 = startPosX1;
-//            float startPosY2 = startPosY1 + fieldLength;
-//            canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
-//
-//            float startPosX3 = startPosX1 + fieldLength / size;
-//            float startPosY3 = startPosY1;
-//            float startPosX4 = startPosX3;
-//            float startPosY4 = startPosY1 + fieldLength;
-//            canvas.drawLine(startPosX3, startPosY3, startPosX4, startPosY4, mPaint);
-//
-//            float startPosX5 = (getWidth() - fieldLength) / 2;
-//            float startPosY5 = (getHeight() / 2) - fieldLength / size / 2;
-//            float startPosX6 = startPosX5 + fieldLength;
-//            float startPosY6 = startPosY5;
-//            canvas.drawLine(startPosX5, startPosY5, startPosX6, startPosY6, mPaint);
-//
-//            float startPosX7 = startPosX5;
-//            float startPosY7 = (getHeight() / 2) + fieldLength / size / 2;
-//            float startPosX8 = startPosX7 + fieldLength;
-//            float startPosY8 = startPosY7;
-//            canvas.drawLine(startPosX7, startPosY7, startPosX8, startPosY8, mPaint);
+
+
 
 
             // drawing vertikal lines
@@ -497,18 +415,14 @@ public class GameViewStatic extends View {
             for (int i = 0; i < simplePlayGround.getBoard().cells.length - 1; i++) {
                 float startPosX1;
                 float startPosY1;
-                if (orient == 1) {
-                    startPosY1 = (getHeight() - fieldLength) / 2;
-                } else {
-                    startPosY1 = (getHeight() - fieldLength) / 2 + getToolBarHeight();
-                }
+
+                startPosY1 = (getHeight() - fieldLength - getToolBarHeight()) / 2 + getToolBarHeight();
+
+
                 float startPosY2 = startPosY1 + fieldLength;
 
-                if (i == 0) {
-                    startPosX1 = (getWidth() - fieldLength) / 2 + fieldLength / size;
-                } else {
-                    startPosX1 = (getWidth() - fieldLength) / 2 + (i + 1) * fieldLength / size;
-                }
+                startPosX1 = (getWidth() - fieldLength) / 2 + (i + 1) * fieldLength / size;
+
                 float startPosX2 = startPosX1;
                 canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
 
@@ -520,11 +434,9 @@ public class GameViewStatic extends View {
                 float startPosX1 = (getWidth() - fieldLength) / 2;
                 float startPosX2 = startPosX1 + fieldLength;
                 float startPosY1;
-                if (orient == 1) {
-                    startPosY1 = ((getHeight() / 2) - fieldLength / 2) + (i + 1) * fieldLength / size;
-                } else {
-                    startPosY1 = ((getHeight() / 2) - fieldLength / 2) + (i + 1) * fieldLength / size + getToolBarHeight();
-                }
+
+                startPosY1 = (getHeight() - fieldLength - getToolBarHeight()) / 2 + getToolBarHeight() + (i + 1) * fieldLength / size;
+
                 float startPosY2 = startPosY1;
                 canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
 
@@ -533,41 +445,22 @@ public class GameViewStatic extends View {
             // filling rects
             if (rects[0][0] == null) {
                 for (int i = 0; i < size; i++) {
-                    float startPosY1 = (getHeight() - fieldLength) / 2;
+                    float startPosY1 = (getHeight() - fieldLength - getToolBarHeight()) / 2 + getToolBarHeight();
                     for (int j = 0; j < size; j++) {
 
                         float startPosX1 = (getWidth() - fieldLength) / 2 + (j + 1) * fieldLength / size;
 
-                        rects[i][j] = new Rect((int) (startPosX1 - fieldLength / size),
-                                (int) (startPosY1 + i * (fieldLength / size)),
-                                (int) (startPosX1),
-                                ((int) (startPosY1 + (i + 1) * (fieldLength / size))));
+                        rects[i][j] = new Rect(Math.round(startPosX1 - fieldLength / size),
+                                Math.round(startPosY1 + i * (fieldLength / size)),
+                                Math.round(startPosX1),
+                                Math.round(startPosY1 + (i + 1) * (fieldLength / size)));
 
                     }
 
                 }
 
             }
-//            if (rects[0][0] == null) {
-//                rects[0][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 - fieldLength / size),
-//                        (int) startPosX1, (int) startPosY5);
-//                rects[0][1] = new Rect((int) startPosX1, (int) (startPosY5 - fieldLength / size),
-//                        (int) (startPosX1 + fieldLength / size), (int) startPosY5);
-//                rects[0][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 - fieldLength / size),
-//                        (int) (startPosX1 + 2 * fieldLength / size), (int) startPosY5);
-//                rects[1][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) startPosY5,
-//                        (int) startPosX1, (int) (startPosY5 + fieldLength / size));
-//                rects[1][1] = new Rect((int) startPosX1, (int) startPosY5,
-//                        (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size));
-//                rects[1][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) startPosY5,
-//                        (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size));
-//                rects[2][0] = new Rect((int) (startPosX1 - fieldLength / size), (int) (startPosY5 + fieldLength / size),
-//                        (int) startPosX1, (int) (startPosY5 + fieldLength / size * 2));
-//                rects[2][1] = new Rect((int) startPosX1, (int) (startPosY5 + fieldLength / size),
-//                        (int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
-//                rects[2][2] = new Rect((int) (startPosX1 + fieldLength / size), (int) (startPosY5 + fieldLength / size),
-//                        (int) (startPosX1 + 2 * fieldLength / size), (int) (startPosY5 + fieldLength / size * 2));
-//            }
+
 
 
             for (int i = 0; i < rects.length; i++) {
@@ -594,9 +487,8 @@ public class GameViewStatic extends View {
     public boolean onTouchEvent(MotionEvent event) {
 
         if (event.getAction() == MotionEvent.ACTION_DOWN &&
-                //(firstThread ||
                 !gameThread.isAlive()) {
-            //if (queue.isEmpty()) queue.add("go");
+
             flag = false;
             touchX = event.getX();
             touchY = event.getY();
@@ -643,7 +535,6 @@ public class GameViewStatic extends View {
 
 
     public void makeBotMove() {
-        // if (simplePlayGround.getCurrentPlayer() == Seed.NOUGHT && !simplePlayGround.isFinished()) {
         String s = new Gson().toJson(this.simplePlayGround);
         int[] compMove = bot.makeBotMove(playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT, s, depth, difficulty);
         int a = compMove[0];
@@ -654,7 +545,7 @@ public class GameViewStatic extends View {
         }
 
 
-        //}
+
 
     }
 
@@ -668,7 +559,6 @@ public class GameViewStatic extends View {
         int savedBoardSize;
         int savedDifficulty;
         int savedCountMove;
-        //int savedBestScore;
 
 
         SavedState(Parcelable superState) {
@@ -685,7 +575,6 @@ public class GameViewStatic extends View {
             savedBoardSize = in.readInt();
             savedDifficulty = in.readInt();
             savedCountMove = in.readInt();
-            //savedBestScore = in.readInt();
         }
 
         @Override
@@ -699,7 +588,6 @@ public class GameViewStatic extends View {
             out.writeInt(savedBoardSize);
             out.writeInt(savedDifficulty);
             out.writeInt(savedCountMove);
-            //out.writeInt(savedBestScore);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
@@ -724,7 +612,6 @@ public class GameViewStatic extends View {
         }
 
         ss.savedPlayerSeed = new Gson().toJson(playerSeed);
-        //ss.savedBot = new Gson().toJson(bot);
         ss.playerWin = playerWin;
         ss.compWin = compWin;
         ss.savedDifficulty = this.difficulty;
@@ -732,10 +619,7 @@ public class GameViewStatic extends View {
         if (!simplePlayGround.isFinished()) {
             ss.savedCountMove = this.countMove;
         }
-        //ss.savedBestScore = this.bestScore;
 
-
-        //Toast.makeText(getContext(), "OnSaveInstanceState", Toast.LENGTH_LONG).show();
         return ss;
     }
 
@@ -759,16 +643,13 @@ public class GameViewStatic extends View {
             simplePlayGround = new Gson().fromJson(ss.savedPlayground, SimplePlayGround.class);
         }
         boardSize = simplePlayGround.getBoard().cells.length;
-        //bot = new Gson().fromJson(ss.savedBot, Bot.class);
         playerWin = ss.playerWin;
         compWin = ss.compWin;
         this.playerSeed = new Gson().fromJson(ss.savedPlayerSeed, Seed.class);
-        //Toast.makeText(getContext(), "onRestoreInstanceState", Toast.LENGTH_LONG).show();
         this.rects = new Rect[simplePlayGround.getBoard().cells.length][simplePlayGround.getBoard().cells.length];
         this.boardSize = ss.savedBoardSize;
         this.difficulty = ss.savedDifficulty;
         this.countMove = ss.savedCountMove;
-        //this.bestScore = ss.savedBestScore;
         ((MainActivity) getContext()).changeToolBarText(Integer.toString(bestScore),
                 Integer.toString(countMove));
     }
@@ -793,7 +674,7 @@ public class GameViewStatic extends View {
             simplePlayGround = new SimplePlayGround(3, 3, 3);
             boardSize = 3;
             rects = new Rect[3][3];
-            depth = 8;
+            depth = difficulty == DIFFICULTY_HARD ? 8 : 5;
             countMove = 0;
             ((MainActivity) getContext()).findViewById(R.id.toolbarTextView).setVisibility(GONE);
         } else {
@@ -807,16 +688,13 @@ public class GameViewStatic extends View {
 
 
         MyApplication.preferences.edit().putInt(SAVED_BOARD_SIZE, boardSize).commit();
-        //invalidate();
         try {
             String s = queue.take();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         startNewGameThread();
-//        simplePlayGround.start();
-//        ((MainActivity) getContext()).changeToolBarText(Integer.toString(countMove),
-//                Integer.toString(bestScore));
+
 
     }
 
@@ -923,16 +801,21 @@ public class GameViewStatic extends View {
 
     }
 
+
     public int getToolBarHeight() {
-        int[] attrs = new int[]{R.attr.actionBarSize};
-        TypedArray ta = getContext().obtainStyledAttributes(attrs);
-        int toolBarHeight = ta.getDimensionPixelSize(0, -1);
-        ta.recycle();
-        return toolBarHeight;
+        return ((MainActivity) getContext()).toolbar.getHeight();
     }
 
-    public int getToolBarHeight2() {
-       return ((MainActivity)getContext()).toolbar.getHeight();
+    public float pxToDp(float px) {
+        DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+        float dp = px / displayMetrics.density;
+        return dp;
+    }
+
+    public int dpToPx(float dp) {
+        DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+        int px = Math.round(dp * displayMetrics.density);
+        return px;
     }
 
 

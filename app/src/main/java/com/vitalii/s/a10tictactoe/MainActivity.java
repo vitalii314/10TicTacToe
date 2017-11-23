@@ -20,9 +20,12 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
@@ -39,12 +42,12 @@ public class MainActivity extends AppCompatActivity
     public SharedPreferences mPref;
     public TextView barText;
     public Toolbar toolbar;
+    private ImageView imageView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //mPref = getPreferences(MODE_PRIVATE);
         //gameView.setId(R.id.viewStatic);
         // setContentView(gameView); //- если только gameView - без кнопок и др элементов
         setContentView(R.layout.activity_main);
@@ -53,7 +56,9 @@ public class MainActivity extends AppCompatActivity
             findViewById(R.id.toolbarTextView).setVisibility(View.VISIBLE);
         }
         gameView = (GameViewStatic) findViewById(R.id.viewStatic);
-        //loadSavedPreferences();
+        imageView = (ImageView)findViewById(R.id.imageView);
+        Picasso.with(this).load(R.drawable.kletka).centerCrop().
+        resize(300,300).into(imageView);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
