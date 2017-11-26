@@ -5,6 +5,8 @@ import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
@@ -18,8 +20,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,9 +60,10 @@ public class MainActivity extends AppCompatActivity
             findViewById(R.id.toolbarTextView).setVisibility(View.VISIBLE);
         }
         gameView = (GameViewStatic) findViewById(R.id.viewStatic);
-        imageView = (ImageView)findViewById(R.id.imageView);
-        Picasso.with(this).load(R.drawable.kletka).centerCrop().
-        resize(300,300).into(imageView);
+        imageView = (ImageView) findViewById(R.id.imageView);
+        //Picasso.with(this).load(R.drawable.kletka).resize(400,500).centerCrop().into(imageView);
+
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -76,15 +81,13 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
         Sound.init(this);
 
     }
-
-
-
 
 
     @Override

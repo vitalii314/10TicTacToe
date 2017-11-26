@@ -40,7 +40,7 @@ public class ChangePlayerFragment extends DialogFragment {
                     }
                 });
 
-        String positiveText = getString(android.R.string.ok);
+        String positiveText = getString(R.string.ok_text);
         builder.setPositiveButton(positiveText,
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -57,7 +57,7 @@ public class ChangePlayerFragment extends DialogFragment {
                     }
                 });
 
-        String negativeText = getString(android.R.string.cancel);
+        String negativeText = getString(R.string.cancel_text);
         builder.setNegativeButton(negativeText,
                 new DialogInterface.OnClickListener() {
                     @Override

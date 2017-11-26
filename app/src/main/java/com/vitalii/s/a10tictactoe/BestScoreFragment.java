@@ -21,7 +21,7 @@ public class BestScoreFragment extends DialogFragment {
                 .setMessage(getResources().getString(R.string.bestScoreText,
                         ((MainActivity)getActivity()).gameView.countMove))
                 .setIcon(null)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.ok_text, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
                        dialog.cancel();

@@ -19,17 +19,20 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
+
+
 import com.google.gson.Gson;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vitalii.s.a10tictactoe.Data.HoteContract;
 import com.vitalii.s.a10tictactoe.Data.HotelDbHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+
 import playground.Bot5.Bot5;
 import playground.Seed;
 import playground.SimplePlayGround;
@@ -40,7 +43,6 @@ import playground.State;
  * Created by user on 30.10.2016.
  */
 public class GameViewStatic extends View {
-
 
 
     public class GameThread extends Thread {
@@ -57,7 +59,6 @@ public class GameViewStatic extends View {
                     return;
                 }
             }
-
 
 
             for (int i = 0; i < rects.length; i++) {
@@ -320,68 +321,21 @@ public class GameViewStatic extends View {
         if (boardSize == BOARD_SIZE_10) readBestScore();
 
 
-
         firstThread = true;
         gameThread = new GameThread();
         gameThread.start();
 
-        Target mTarget = new Target() {
 
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                GameViewStatic.this.bitmap = bitmap;
-                invalidate();
-                targets.remove(this);
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                targets.remove(this);
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-
-
-        };
-
-        targets.add(mTarget);
-        Picasso.with(getContext()).load(R.drawable.kletka).
-                memoryPolicy(MemoryPolicy.NO_STORE, MemoryPolicy.NO_CACHE).into(targets.get(0));
 
     }
-
-
-
 
 
     @Override
     protected void onDraw(Canvas canvas) {
 
 
-        if (bitmap != null) {
-
-            final float scaleFactorX;
-            final float scaleFactorY;
             int size = simplePlayGround.getBoard().cells.length;
 
-
-
-            if (getWidth() > WIDTH || getHeight() > HEIGHT) {
-                scaleFactorX = (float) getWidth() / WIDTH;
-                scaleFactorY = (float) getHeight() / HEIGHT;
-            } else {
-                scaleFactorX = 1;
-                scaleFactorY = 1;
-            }
-            final int savedState = canvas.save();
-            canvas.scale(scaleFactorX, scaleFactorY);
-
-            //canvas.drawBitmap(bitmap, 0, 0, null);
-            canvas.restoreToCount(savedState);
 
 
             int orient = getContext().getResources().getConfiguration().orientation;
@@ -405,9 +359,6 @@ public class GameViewStatic extends View {
 
 
             }
-
-
-
 
 
             // drawing vertikal lines
@@ -462,7 +413,6 @@ public class GameViewStatic extends View {
             }
 
 
-
             for (int i = 0; i < rects.length; i++) {
                 for (int j = 0; j < rects[i].length; j++) {
 
@@ -480,7 +430,7 @@ public class GameViewStatic extends View {
                 }
             }
             if (queue.isEmpty()) queue.add("go");
-        }
+
     }
 
 
@@ -543,8 +493,6 @@ public class GameViewStatic extends View {
             System.out.println(" BOT MADE MOVE");
             State state = simplePlayGround.doStep(a, b);
         }
-
-
 
 
     }
