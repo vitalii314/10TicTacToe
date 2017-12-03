@@ -84,7 +84,7 @@ public class GameViewStatic extends View {
                                 ((MainActivity) getContext()).showBestScoreFragment();
                                 Sound.stopSound();
                                 if (isSound) Sound.playBestScoreSound();
-                            } else if (countMove < bestScore && boardSize == BOARD_SIZE_3) {
+                            } else if (countMove < bestScore && boardSize == BOARD_SIZE_10) {
                                 bestScore = countMove;
                                 saveBestScore(bestScore);
                                 ((MainActivity) getContext()).showBestScoreFragment();
