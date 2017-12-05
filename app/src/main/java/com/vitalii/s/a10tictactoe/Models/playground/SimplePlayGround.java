@@ -1,4 +1,4 @@
-package playground;
+package com.vitalii.s.a10tictactoe.Models.playground;
 
 public class SimplePlayGround implements Playground {
     private Board board;
@@ -90,10 +90,7 @@ public class SimplePlayGround implements Playground {
         if (!(i < this.rows && i >= 0 && j < this.cols && j >= 0)) {
             return false;
         }
-        if (board.cells[i][j].content != Seed.EMPTY) {
-            return false;
-        }
-        return true;
+        return board.cells[i][j].content == Seed.EMPTY;
     }
 
     private void updateState(int i, int j) {

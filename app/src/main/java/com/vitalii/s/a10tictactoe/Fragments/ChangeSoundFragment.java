@@ -1,4 +1,4 @@
-package com.vitalii.s.a10tictactoe;
+package com.vitalii.s.a10tictactoe.Fragments;
 
 import android.app.Dialog;
 import android.support.v4.app.DialogFragment;
@@ -6,7 +6,12 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.widget.Toast;
+
+import com.vitalii.s.a10tictactoe.Activities.MainActivity;
+import com.vitalii.s.a10tictactoe.R;
 
 /**
  * Created by user on 07.08.2017.
@@ -24,6 +29,7 @@ public class ChangeSoundFragment extends DialogFragment {
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
+
         builder.setTitle("Sound");
 
         //list of items
@@ -44,13 +50,10 @@ public class ChangeSoundFragment extends DialogFragment {
                         // positive button logic
                         if (selection == 0) {
                             ((MainActivity) getContext()).changeIsSound(true);
-                            Toast.makeText(getContext(), "Sound=" +
-                                    ((MainActivity) getContext()).gameView.isSound, Toast.LENGTH_SHORT).show();
 
                         } else {
                             ((MainActivity) getContext()).changeIsSound(false);
-                            Toast.makeText(getContext(), "Sound=" +
-                                    ((MainActivity) getContext()).gameView.isSound, Toast.LENGTH_SHORT).show();
+
                         }
                     }
                 });
@@ -67,5 +70,15 @@ public class ChangeSoundFragment extends DialogFragment {
 
         return builder.create();
 
+    }
+
+    @Override
+    public void onResume() {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int width = displayMetrics.widthPixels;
+        int heigth = getDialog().getWindow().getAttributes().height;
+        if (width/displayMetrics.density>=335) width = (int)(300*displayMetrics.density);
+        getDialog().getWindow().setLayout(width,heigth );
+        super.onResume();
     }
 }

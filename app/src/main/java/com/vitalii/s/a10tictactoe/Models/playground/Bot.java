@@ -1,4 +1,4 @@
-package playground;
+package com.vitalii.s.a10tictactoe.Models.playground;
 
 /**
  * Created by user on 15.08.2016.

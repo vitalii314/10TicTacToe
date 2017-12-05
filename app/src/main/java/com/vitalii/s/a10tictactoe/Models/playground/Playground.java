@@ -1,4 +1,4 @@
-package playground;
+package com.vitalii.s.a10tictactoe.Models.playground;
 
 public interface Playground {
     void start();

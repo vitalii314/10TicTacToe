@@ -1,4 +1,4 @@
-package playground;
+package com.vitalii.s.a10tictactoe.Models.playground;
 
 public enum State {
         PLAY,

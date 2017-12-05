@@ -1,7 +1,6 @@
-package playground.Bot5;
+package com.vitalii.s.a10tictactoe.Interfaces;
 
-import playground.Seed;
-import playground.SimplePlayGround;
+import com.vitalii.s.a10tictactoe.Models.playground.Seed;
 
 /**
  * Created by user on 11.06.2017.

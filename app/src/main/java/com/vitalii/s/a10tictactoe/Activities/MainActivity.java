@@ -1,17 +1,7 @@
-package com.vitalii.s.a10tictactoe;
+package com.vitalii.s.a10tictactoe.Activities;
 
 
-import android.annotation.TargetApi;
 import android.content.SharedPreferences;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Rect;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.SoundPool;
-import android.os.Build;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -20,28 +10,30 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
-import com.squareup.picasso.Picasso;
+import com.vitalii.s.a10tictactoe.Fragments.BestScoreFragment;
+import com.vitalii.s.a10tictactoe.Fragments.ChangeBoardSizeFragment;
+import com.vitalii.s.a10tictactoe.Fragments.ChangeDifficultyFragment;
+import com.vitalii.s.a10tictactoe.Fragments.ChangePlayerFragment;
+import com.vitalii.s.a10tictactoe.Fragments.ChangeSoundFragment;
+import com.vitalii.s.a10tictactoe.MyApplication;
+import com.vitalii.s.a10tictactoe.Fragments.NewGameFragment;
+import com.vitalii.s.a10tictactoe.R;
+import com.vitalii.s.a10tictactoe.Data.Sound;
 
-import java.io.IOException;
-
-import playground.Seed;
-import playground.SimplePlayGround;
+import com.vitalii.s.a10tictactoe.Models.playground.Seed;
 
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     //private static final String SAVED_BOARD_SIZE = "saved board size";
-    GameViewStatic gameView;
+    public GameViewStatic gameView;
     public TextView scoreText;
     public SharedPreferences mPref;
     public TextView barText;

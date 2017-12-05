@@ -5,8 +5,8 @@ import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
 
-import playground.Seed;
-import playground.SimplePlayGround;
+import com.vitalii.s.a10tictactoe.Models.playground.Seed;
+import com.vitalii.s.a10tictactoe.Models.playground.SimplePlayGround;
 
 import static org.junit.Assert.*;
 

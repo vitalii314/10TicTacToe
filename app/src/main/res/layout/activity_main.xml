@@ -33,7 +33,7 @@
         <!--android:layout_alignParentTop="true" -->
 
 
-        <com.vitalii.s.a10tictactoe.GameViewStatic
+        <com.vitalii.s.a10tictactoe.Activities.GameViewStatic
             android:id="@+id/viewStatic"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -73,7 +73,7 @@
 
     <!--<RelativeLayout--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent"--><!--android:layout_gravity="center">-->
 
-    <!--<com.vitalii.s.a10tictactoe.GameViewStatic--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:id="@+id/viewStatic"--><!--android:layout_alignParentTop="true"--><!--android:layout_alignParentEnd="true"--><!--android:layout_alignParentBottom="true"--><!--android:layout_alignParentStart="true" />-->
+    <!--<com.vitalii.s.a10tictactoe.Activities.GameViewStatic--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:id="@+id/viewStatic"--><!--android:layout_alignParentTop="true"--><!--android:layout_alignParentEnd="true"--><!--android:layout_alignParentBottom="true"--><!--android:layout_alignParentStart="true" />-->
 
     <!--<TextView--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:textAppearance="?android:attr/textAppearanceSmall"--><!--android:text="@string/score"--><!--android:id="@+id/scoreText"--><!--android:layout_marginEnd="85dp"--><!--android:contextClickable="false"--><!--android:layout_alignParentTop="true"--><!--android:layout_alignParentEnd="true" />-->
 

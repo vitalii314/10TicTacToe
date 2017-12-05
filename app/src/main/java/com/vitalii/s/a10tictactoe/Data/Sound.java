@@ -1,4 +1,4 @@
-package com.vitalii.s.a10tictactoe;
+package com.vitalii.s.a10tictactoe.Data;
 
 import android.annotation.TargetApi;
 import android.content.Context;

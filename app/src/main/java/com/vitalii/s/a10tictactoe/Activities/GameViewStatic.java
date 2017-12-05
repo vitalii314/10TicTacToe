@@ -1,4 +1,4 @@
-package com.vitalii.s.a10tictactoe;
+package com.vitalii.s.a10tictactoe.Activities;
 
 
 import android.content.ContentValues;
@@ -11,8 +11,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.media.SoundPool;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -22,21 +20,22 @@ import android.view.View;
 
 
 import com.google.gson.Gson;
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vitalii.s.a10tictactoe.Data.HoteContract;
 import com.vitalii.s.a10tictactoe.Data.HotelDbHelper;
+import com.vitalii.s.a10tictactoe.MyApplication;
+import com.vitalii.s.a10tictactoe.R;
+import com.vitalii.s.a10tictactoe.Data.Sound;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import playground.Bot5.Bot5;
-import playground.Seed;
-import playground.SimplePlayGround;
-import playground.State;
+import com.vitalii.s.a10tictactoe.Models.playground.Bot5.Bot5;
+import com.vitalii.s.a10tictactoe.Models.playground.Seed;
+import com.vitalii.s.a10tictactoe.Models.playground.SimplePlayGround;
+import com.vitalii.s.a10tictactoe.Models.playground.State;
 
 
 /**
@@ -231,7 +230,7 @@ public class GameViewStatic extends View {
     float touchX = 0;
     float touchY = 0;
     private Bitmap bitmap;
-    SimplePlayGround simplePlayGround;
+    public SimplePlayGround simplePlayGround;
     private Bot5 bot;
     private boolean flag;
     GameThread gameThread = new GameThread();
@@ -241,11 +240,11 @@ public class GameViewStatic extends View {
     public static int playerWin;
     public static int compWin;
     public float fieldLength;
-    Seed playerSeed;
-    int difficulty;
-    boolean isSound;
+    public Seed playerSeed;
+    public int difficulty;
+    public boolean isSound;
     int boardSize;
-    int countMove;
+    public int countMove;
     int bestScore;
     private HotelDbHelper mDbHelper;
 
@@ -326,7 +325,6 @@ public class GameViewStatic extends View {
         gameThread.start();
 
 
-
     }
 
 
@@ -334,102 +332,105 @@ public class GameViewStatic extends View {
     protected void onDraw(Canvas canvas) {
 
 
-            int size = simplePlayGround.getBoard().cells.length;
+        int size = simplePlayGround.getBoard().cells.length;
 
 
-
-            int orient = getContext().getResources().getConfiguration().orientation;
-            if (orient == 1) { //vertikal orientation
-                fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getWidth() - dpToPx(35)) : (getWidth() / 2));
-                float k = boardSize == 3 ? pxToDp(fieldLength) / NORMAL_FIELDLENGTH_3_IN_DP : pxToDp(fieldLength) / NORMAL_FIELDLENGTH_10_IN_DP;
-                float a = boardSize == 3 ? LINE_WIDTH_NORMAL * k : (LINE_WIDTH_NORMAL / 2) * k;
-                mPaint.setStrokeWidth(Math.round(a));
-                mCirclePaint.setStrokeWidth(Math.round(a));
-                mCrossPaint.setStrokeWidth(Math.round(a));
-
-
-            } else {
-                fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? getHeight() - dpToPx(35) - getToolBarHeight() : getHeight() / 2);
-
-                float k = boardSize == 3 ? pxToDp(fieldLength) / NORMAL_FIELDLENGTH_3_IN_DP : pxToDp(fieldLength) / NORMAL_FIELDLENGTH_10_IN_DP;
-                float a = boardSize == 3 ? LINE_WIDTH_NORMAL * k : (LINE_WIDTH_NORMAL / 2) * k;
-                mPaint.setStrokeWidth(Math.round(a));
-                mCirclePaint.setStrokeWidth(Math.round(a));
-                mCrossPaint.setStrokeWidth(Math.round(a));
+        int orient = getContext().getResources().getConfiguration().orientation;
+        if (orient == 1) { //vertikal orientation
+            int fieldOffstet;
+            fieldOffstet = pxToDp(getWidth()) <= 320 ? 35 : Math.round(pxToDp(getWidth()) / 9.14f);
+            fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? (getWidth() - dpToPx(fieldOffstet)) : (getWidth() / 2));
+            float k = boardSize == 3 ? pxToDp(fieldLength) / NORMAL_FIELDLENGTH_3_IN_DP : pxToDp(fieldLength) / NORMAL_FIELDLENGTH_10_IN_DP;
+            float a = boardSize == 3 ? LINE_WIDTH_NORMAL * k : (LINE_WIDTH_NORMAL / 2) * k;
+            mPaint.setStrokeWidth(Math.round(a));
+            mCirclePaint.setStrokeWidth(Math.round(a));
+            mCrossPaint.setStrokeWidth(Math.round(a));
 
 
-            }
+        } else {
+
+            int fieldOffstet;
+            fieldOffstet = pxToDp(getHeight()) <= 320 ? 35 : Math.round(pxToDp(getHeight()) / 9);
+            fieldLength = (simplePlayGround.getBoard().cells.length == 10 ? getHeight() - dpToPx(fieldOffstet) - getToolBarHeight() : getHeight() / 2);
+            float k = boardSize == 3 ? pxToDp(fieldLength) / NORMAL_FIELDLENGTH_3_IN_DP : pxToDp(fieldLength) / NORMAL_FIELDLENGTH_10_IN_DP;
+            float a = boardSize == 3 ? LINE_WIDTH_NORMAL * k : (LINE_WIDTH_NORMAL / 2) * k;
+            mPaint.setStrokeWidth(Math.round(a));
+            mCirclePaint.setStrokeWidth(Math.round(a));
+            mCrossPaint.setStrokeWidth(Math.round(a));
 
 
-            // drawing vertikal lines
-
-            for (int i = 0; i < simplePlayGround.getBoard().cells.length - 1; i++) {
-                float startPosX1;
-                float startPosY1;
-
-                startPosY1 = (getHeight() - fieldLength - getToolBarHeight()) / 2 + getToolBarHeight();
+        }
 
 
-                float startPosY2 = startPosY1 + fieldLength;
+        // drawing vertikal lines
 
-                startPosX1 = (getWidth() - fieldLength) / 2 + (i + 1) * fieldLength / size;
+        for (int i = 0; i < simplePlayGround.getBoard().cells.length - 1; i++) {
+            float startPosX1;
+            float startPosY1;
 
-                float startPosX2 = startPosX1;
-                canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
-
-            }
-
-            // drawing horizontal linesа
-            for (int i = 0; i < simplePlayGround.getBoard().cells.length - 1; i++) {
-
-                float startPosX1 = (getWidth() - fieldLength) / 2;
-                float startPosX2 = startPosX1 + fieldLength;
-                float startPosY1;
-
-                startPosY1 = (getHeight() - fieldLength - getToolBarHeight()) / 2 + getToolBarHeight() + (i + 1) * fieldLength / size;
-
-                float startPosY2 = startPosY1;
-                canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
+            startPosY1 = (getHeight() - fieldLength - getToolBarHeight()) / 2 + getToolBarHeight();
 
 
-            }
-            // filling rects
-            if (rects[0][0] == null) {
-                for (int i = 0; i < size; i++) {
-                    float startPosY1 = (getHeight() - fieldLength - getToolBarHeight()) / 2 + getToolBarHeight();
-                    for (int j = 0; j < size; j++) {
+            float startPosY2 = startPosY1 + fieldLength;
 
-                        float startPosX1 = (getWidth() - fieldLength) / 2 + (j + 1) * fieldLength / size;
+            startPosX1 = (getWidth() - fieldLength) / 2 + (i + 1) * fieldLength / size;
 
-                        rects[i][j] = new Rect(Math.round(startPosX1 - fieldLength / size),
-                                Math.round(startPosY1 + i * (fieldLength / size)),
-                                Math.round(startPosX1),
-                                Math.round(startPosY1 + (i + 1) * (fieldLength / size)));
+            float startPosX2 = startPosX1;
+            canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
 
-                    }
+        }
+
+        // drawing horizontal linesа
+        for (int i = 0; i < simplePlayGround.getBoard().cells.length - 1; i++) {
+
+            float startPosX1 = (getWidth() - fieldLength) / 2;
+            float startPosX2 = startPosX1 + fieldLength;
+            float startPosY1;
+
+            startPosY1 = (getHeight() - fieldLength - getToolBarHeight()) / 2 + getToolBarHeight() + (i + 1) * fieldLength / size;
+
+            float startPosY2 = startPosY1;
+            canvas.drawLine(startPosX1, startPosY1, startPosX2, startPosY2, mPaint);
+
+
+        }
+        // filling rects
+        if (rects[0][0] == null) {
+            for (int i = 0; i < size; i++) {
+                float startPosY1 = (getHeight() - fieldLength - getToolBarHeight()) / 2 + getToolBarHeight();
+                for (int j = 0; j < size; j++) {
+
+                    float startPosX1 = (getWidth() - fieldLength) / 2 + (j + 1) * fieldLength / size;
+
+                    rects[i][j] = new Rect(Math.round(startPosX1 - fieldLength / size),
+                            Math.round(startPosY1 + i * (fieldLength / size)),
+                            Math.round(startPosX1),
+                            Math.round(startPosY1 + (i + 1) * (fieldLength / size)));
 
                 }
 
             }
 
+        }
 
-            for (int i = 0; i < rects.length; i++) {
-                for (int j = 0; j < rects[i].length; j++) {
 
-                    if (simplePlayGround.getBoard().cells[i][j].content == Seed.CROSS) {
-                        drawCross(canvas, rects[i][j].centerX(), rects[i][j].centerY());
+        for (int i = 0; i < rects.length; i++) {
+            for (int j = 0; j < rects[i].length; j++) {
+
+                if (simplePlayGround.getBoard().cells[i][j].content == Seed.CROSS) {
+                    drawCross(canvas, rects[i][j].centerX(), rects[i][j].centerY());
+                    System.out.println("PLAYGROUND " + i + ", " + j + " " + simplePlayGround.getBoard().cells[i][j].content);
+                } else {
+                    if (simplePlayGround.getBoard().cells[i][j].content == Seed.NOUGHT) {
+                        drawCirlce(canvas, rects[i][j].centerX(), rects[i][j].centerY());
                         System.out.println("PLAYGROUND " + i + ", " + j + " " + simplePlayGround.getBoard().cells[i][j].content);
-                    } else {
-                        if (simplePlayGround.getBoard().cells[i][j].content == Seed.NOUGHT) {
-                            drawCirlce(canvas, rects[i][j].centerX(), rects[i][j].centerY());
-                            System.out.println("PLAYGROUND " + i + ", " + j + " " + simplePlayGround.getBoard().cells[i][j].content);
-                        }
-
                     }
 
                 }
+
             }
-            if (queue.isEmpty()) queue.add("go");
+        }
+        if (queue.isEmpty()) queue.add("go");
 
     }
 
@@ -754,7 +755,7 @@ public class GameViewStatic extends View {
         return ((MainActivity) getContext()).toolbar.getHeight();
     }
 
-    public float pxToDp(float px) {
+    public  float pxToDp(float px) {
         DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
         float dp = px / displayMetrics.density;
         return dp;

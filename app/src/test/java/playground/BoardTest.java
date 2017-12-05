@@ -1,15 +1,14 @@
 package playground;
 
 import com.google.gson.Gson;
-import com.vitalii.s.a10tictactoe.GameViewStatic;
+import com.vitalii.s.a10tictactoe.Activities.GameViewStatic;
 
 import org.junit.Test;
 
-import java.util.Scanner;
-
-import playground.Bot5.Bot5;
-
-import static org.junit.Assert.*;
+import com.vitalii.s.a10tictactoe.Models.playground.Board;
+import com.vitalii.s.a10tictactoe.Models.playground.Bot5.Bot5;
+import com.vitalii.s.a10tictactoe.Models.playground.Seed;
+import com.vitalii.s.a10tictactoe.Models.playground.SimplePlayGround;
 
 /**
  * Created by user on 17.06.2017.
@@ -21,7 +20,7 @@ public class BoardTest {
     public void botDifficultyTest() throws Exception {
         SimplePlayGround simplePlayGround= new SimplePlayGround(10,10,5);
         simplePlayGround.start();
-        simplePlayGround.getBoard().cells[1][1].content=Seed.NOUGHT;
+        simplePlayGround.getBoard().cells[1][1].content= Seed.NOUGHT;
         simplePlayGround.getBoard().cells[4][3].content=Seed.NOUGHT;
         simplePlayGround.getBoard().cells[5][3].content=Seed.NOUGHT;
         simplePlayGround.getBoard().cells[5][2].content=Seed.NOUGHT;
@@ -91,7 +90,7 @@ public class BoardTest {
 
     @Test
     public void testHasWonHorizontal() throws Exception {
-        Board  board = new Board(10,10,5);
+        Board board = new Board(10,10,5);
         board.cells[1][5].content=Seed.CROSS;
         board.cells[1][4].content=Seed.CROSS;
         board.cells[1][2].content=Seed.CROSS;

@@ -1,15 +1,15 @@
-package playground.Bot5;
+package com.vitalii.s.a10tictactoe.Models.playground.Bot5;
 
 /**
  * Created by user on 10.02.2017.
  */
 
 import com.google.gson.Gson;
-import com.vitalii.s.a10tictactoe.GameViewStatic;
+import com.vitalii.s.a10tictactoe.Activities.GameViewStatic;
 
-import playground.Playground;
-import playground.Seed;
-import playground.SimplePlayGround;
+import com.vitalii.s.a10tictactoe.Interfaces.Playable;
+import com.vitalii.s.a10tictactoe.Models.playground.Seed;
+import com.vitalii.s.a10tictactoe.Models.playground.SimplePlayGround;
 
 import java.util.ArrayList;
 import java.util.List;

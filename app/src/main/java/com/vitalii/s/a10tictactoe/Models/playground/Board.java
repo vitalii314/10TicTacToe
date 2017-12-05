@@ -1,7 +1,6 @@
-package playground;
+package com.vitalii.s.a10tictactoe.Models.playground;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Board {  // save as Board.java
     // Named-constants for the dimensions
@@ -138,12 +137,9 @@ public class Board {  // save as Board.java
             winningFields.add(new int[][]{{currentRow + count2,currentCol - count2 }});
 
         }
-        if ((count1 + count2) >= numberToWin - 1 &&
-                cells[currentRow][currentCol].content == theSeed) {
-            return true;
-        }
+        return (count1 + count2) >= numberToWin - 1 &&
+                cells[currentRow][currentCol].content == theSeed;
 
-        return false;
     }
 
 
