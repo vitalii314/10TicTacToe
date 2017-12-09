@@ -40,7 +40,6 @@ public class Sound {
             public void onLoadComplete(SoundPool soundPool, int sampleId,
                                        int status) {
                 mSoundLoaded = true;
-                System.out.println("MSOUND LOADED = TRUE");
             }
         });
 
@@ -58,7 +57,6 @@ public class Sound {
     @SuppressWarnings("deprecation")
     private static void createOldSoundPool() {
         mSoundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
-        System.out.println("SoundPool created");
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -76,10 +74,9 @@ public class Sound {
         AssetFileDescriptor afd;
         try {
             afd = mAssetManager.openFd(fileName);
-            System.out.println("LOADING SOUND");
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(context, "Не могу загрузить файл " + fileName,
+            Toast.makeText(context, "Can't load sound file  " + fileName,
                     Toast.LENGTH_SHORT).show();
             return -1;
         }
@@ -95,7 +92,6 @@ public class Sound {
             mStreamID = mSoundPool.play(sound, 1, 1, 1, 0, 1);
         }
 
-        System.out.println("playing sound");
         return mStreamID;
     }
 

@@ -1,7 +1,6 @@
 package com.vitalii.s.a10tictactoe.Activities;
 
 
-import android.content.SharedPreferences;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -12,7 +11,6 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -32,19 +30,14 @@ import com.vitalii.s.a10tictactoe.Models.playground.Seed;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    //private static final String SAVED_BOARD_SIZE = "saved board size";
     public GameViewStatic gameView;
-    public TextView scoreText;
-    public SharedPreferences mPref;
     public TextView barText;
     public Toolbar toolbar;
-    private ImageView imageView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //gameView.setId(R.id.viewStatic);
         // setContentView(gameView); //- если только gameView - без кнопок и др элементов
         setContentView(R.layout.activity_main);
         if (MyApplication.preferences.getInt(GameViewStatic.SAVED_BOARD_SIZE,
@@ -52,9 +45,6 @@ public class MainActivity extends AppCompatActivity
             findViewById(R.id.toolbarTextView).setVisibility(View.VISIBLE);
         }
         gameView = (GameViewStatic) findViewById(R.id.viewStatic);
-        imageView = (ImageView) findViewById(R.id.imageView);
-        //Picasso.with(this).load(R.drawable.kletka).resize(400,500).centerCrop().into(imageView);
-
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -69,7 +59,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        //Toast.makeText(this,"SHaredPreferences"+mPref.getInt(SAVED_BOARD_SIZE,100),Toast.LENGTH_SHORT).show();
 
     }
 
@@ -127,12 +116,6 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -189,7 +172,6 @@ public class MainActivity extends AppCompatActivity
         barText = (TextView) findViewById(R.id.toolbarTextView);
         String bestScore = Integer.toString(gameView.bestScore);
         String playerMove = Integer.toString(gameView.countMove);
-        //barText.setText("Best score: " + bestScore + " " + "Move: " + playerMove);
         String text;
         if (!bestScore.equals("0")) {
             text = getResources().getString(R.string.toolBarText, bestScore, playerMove, " ");
@@ -198,32 +180,6 @@ public class MainActivity extends AppCompatActivity
         }
         barText.setText(text);
     }
-
-    //    @Override
-//    protected void onSaveInstanceState(Bundle outState) {
-//
-//        SharedPreferences.Editor ed = mPref.edit();
-//        ed.putInt(SAVED_BOARD_SIZE,gameView.boardSize);
-//        ed.commit();
-//        Toast.makeText(this,"SharedPref saved", Toast.LENGTH_LONG).show();
-//        super.onSaveInstanceState(outState);
-//    }
-
-//    public void loadSavedPreferences() {
-//        gameView.boardSize = mPref.getInt(SAVED_BOARD_SIZE,GameViewStatic.BOARD_SIZE_10);
-//        gameView.simplePlayGround = new SimplePlayGround(gameView.boardSize,gameView.boardSize,
-//                gameView.boardSize==10?5:3);
-//        gameView.simplePlayGround.start();
-//        gameView.rects=new Rect[gameView.simplePlayGround.getBoard().cells.length]
-//                [gameView.simplePlayGround.getBoard().cells[0].length];
-//    }
-
-//    @Override
-//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        Toast.makeText(this,"restored",Toast.LENGTH_LONG).show();
-//
-//    }
 
 
 }

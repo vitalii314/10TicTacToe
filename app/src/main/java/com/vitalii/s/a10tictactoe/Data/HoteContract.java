@@ -18,7 +18,6 @@ public class HoteContract {
         public final static String TABLE_NAME_DIFF_EASY_NOUGHT = "bestScoreEasyNought";
         public final static String TABLE_NAME_DIFF_HARD_NOUGHT = "bestScoreHardNought";
         public final static String _ID = BaseColumns._ID;
-        //public final static String COLUMN_NAME = "name";
         public final static String COLUMN_SCORE = "score";
 
     }

@@ -9,7 +9,7 @@ public class Board {  // save as Board.java
     public int ROWS;
     public int COLS;
     public int numberToWin;
-    public ArrayList winningFields ;
+    public ArrayList<int[][]> winningFields ;
 
     // package access
     public Cell[][] cells;  // a board composes of ROWS-by-COLS Cell instances
@@ -52,7 +52,7 @@ public class Board {  // save as Board.java
      * (currentRow, currentCol)
      */
     public boolean hasWon(Seed theSeed) {
-//
+
         int count1 = 0;
         int winnigFieldsCount = 0;
         winningFields.clear();
@@ -150,11 +150,11 @@ public class Board {  // save as Board.java
         for (int row = 0; row < ROWS; ++row) {
             for (int col = 0; col < COLS; ++col) {
                 cells[row][col].paint();   // each cell paints itself
-                if (col < COLS - 1) System.out.print("|");
+                //if (col < COLS - 1) System.out.print("|");
             }
-            System.out.println();
+           // System.out.println();
             if (row < ROWS - 1) {
-                System.out.println("-----------");
+              //  System.out.println("-----------");
             }
         }
     }

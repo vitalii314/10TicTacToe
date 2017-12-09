@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,7 +19,6 @@ import android.view.View;
 
 
 import com.google.gson.Gson;
-import com.squareup.picasso.Target;
 import com.vitalii.s.a10tictactoe.Data.HoteContract;
 import com.vitalii.s.a10tictactoe.Data.HotelDbHelper;
 import com.vitalii.s.a10tictactoe.MyApplication;
@@ -28,7 +26,6 @@ import com.vitalii.s.a10tictactoe.R;
 import com.vitalii.s.a10tictactoe.Data.Sound;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -163,7 +160,7 @@ public class GameViewStatic extends View {
                 tempSeed[i] = simplePlayGround.getBoard().
                         cells[tempArr[0][0]][tempArr[0][1]].content;
             }
-//
+
 
             for (int i = 0; i < 3; i++) {
                 try {
@@ -218,25 +215,20 @@ public class GameViewStatic extends View {
 
 
     final BlockingQueue<String> queue = new ArrayBlockingQueue<>(1);
-    // private int[] boardSize = {10, 10, 5, 3}; //playground rows, cols, number to win,depth
     int depth;
     private Context context;
     public Rect[][] rects;
     private Paint mPaint;
     private Paint mCirclePaint;
     private Paint mCrossPaint;
-    public static final int WIDTH = 960;
-    public static final int HEIGHT = 1280;
     float touchX = 0;
     float touchY = 0;
-    private Bitmap bitmap;
     public SimplePlayGround simplePlayGround;
     private Bot5 bot;
     private boolean flag;
     GameThread gameThread = new GameThread();
     private boolean firstThread = false;
     private ArrayList winningFields = new ArrayList<>();
-    final List<Target> targets = new ArrayList<>();
     public static int playerWin;
     public static int compWin;
     public float fieldLength;
@@ -419,11 +411,9 @@ public class GameViewStatic extends View {
 
                 if (simplePlayGround.getBoard().cells[i][j].content == Seed.CROSS) {
                     drawCross(canvas, rects[i][j].centerX(), rects[i][j].centerY());
-                    System.out.println("PLAYGROUND " + i + ", " + j + " " + simplePlayGround.getBoard().cells[i][j].content);
                 } else {
                     if (simplePlayGround.getBoard().cells[i][j].content == Seed.NOUGHT) {
                         drawCirlce(canvas, rects[i][j].centerX(), rects[i][j].centerY());
-                        System.out.println("PLAYGROUND " + i + ", " + j + " " + simplePlayGround.getBoard().cells[i][j].content);
                     }
 
                 }
@@ -465,7 +455,6 @@ public class GameViewStatic extends View {
 
     public void drawCross(Canvas canvas, int x, int y) {
         int size = simplePlayGround.getBoard().cells.length;
-        //float offset = (float) getWidth() / 2 / size / 3.9f / 2;
         float offset = fieldLength / size / 3.9f / 2;
 
 
@@ -491,7 +480,6 @@ public class GameViewStatic extends View {
         int a = compMove[0];
         int b = compMove[1];
         if (!Thread.currentThread().isInterrupted()) {
-            System.out.println(" BOT MADE MOVE");
             State state = simplePlayGround.doStep(a, b);
         }
 
@@ -715,7 +703,6 @@ public class GameViewStatic extends View {
                 int currentID = cursor.getInt(idColumnIndex);
                 //String currentName = cursor.getString(nameColumnIndex);
                 String currentScore = cursor.getString(scoreColumnIndex);
-                System.out.println("ID=" + currentID + " score=" + currentScore);
 
                 return Integer.parseInt(currentScore);
             }
