@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class HotelDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "hotel.db";
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 17;
 
 
 

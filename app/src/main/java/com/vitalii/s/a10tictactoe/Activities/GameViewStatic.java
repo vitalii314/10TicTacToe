@@ -129,8 +129,6 @@ public class GameViewStatic extends View {
                 postInvalidate();
                 if (isSound) Sound.playMoveSound();
                 if (simplePlayGround.getBoard().hasWon(playerSeed == Seed.NOUGHT ? Seed.CROSS : Seed.NOUGHT)) {
-
-                    Sound.playWinSound();
                     showWinner();
                 }
 
@@ -643,7 +641,14 @@ public class GameViewStatic extends View {
     }
 
     public void changeDifficulty(int diff) {
-        difficulty = diff;
+            difficulty = diff;
+        if (boardSize == BOARD_SIZE_3) {
+            depth = difficulty == DIFFICULTY_HARD ? 8 : 5;
+
+        } else {
+            depth = 3;
+        }
+
         MyApplication.preferences.edit().putInt(SAVED_DIFFICULTY, difficulty).commit();
 
     }

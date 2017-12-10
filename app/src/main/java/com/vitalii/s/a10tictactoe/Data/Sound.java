@@ -49,7 +49,7 @@ public class Sound {
         //получим идентификаторы
         mMoveSound = loadSound("moveSoundNew.wav", context);
         mBestScoreSound = loadSound("bestScoreSound.wav", context);
-        mWinSound = loadSound("win.mp3", context);
+        mWinSound = loadSound("win.wav", context);
 
 
     }

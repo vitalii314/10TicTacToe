@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Simple tic-tac-toe</string>
+    <string name="app_name">Simple \ntic-tac-toe</string>
     <string name="title_activity_starting">StartingActivity</string>
     <string name="singlePlayer">Single Player</string>
     <string name="multiPlayer">Multiplayer</string>
